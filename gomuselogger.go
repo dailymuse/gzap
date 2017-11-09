@@ -2,6 +2,7 @@ package gomuselogger
 
 import (
 	"crypto/tls"
+	"errors"
 	"time"
 
 	"github.com/Devatoria/go-graylog"
@@ -24,6 +25,7 @@ var graylogConnectionTimeout = 3 * time.Second
 
 // Config write the logs here TODO
 type Config struct {
+	GetAppName         func() string
 	GetIsProdEnv       func() bool
 	GetIsStagingEnv    func() bool
 	GetIsTestEnv       func() bool
@@ -33,9 +35,9 @@ type Config struct {
 	GetHostname        func() string
 	UseTLS             bool
 	InsecureSkipVerify bool
+	GetEnvName         func() string
+	isMock             bool
 }
-
-//func NewDefault()
 
 // New sets up the basic logger for either a Production or development
 // environment.
@@ -66,17 +68,39 @@ func New(cfg *Config) error {
 	return nil
 }
 
-// getLogger fetchess a reference to an instantied Logger, or inits a new logger.
-// ASSUMES IT'S RUNNING IN TEST
+// getLogger is an internal function that fetches a reference to an instantied Logger,
+// or inits a new logger.
+// TODO mention that it assumes an ENV is a test env if none is given.
 func getLogger() *zap.Logger {
 	if logger == nil {
-		//New()
+		New(&Config{
+			GetIsProdEnv: func() bool {
+				return false
+			},
+			GetIsStagingEnv: func() bool {
+				return false
+			},
+			GetIsTestEnv: func() bool {
+				return true
+			},
+		})
 	}
 
 	return logger
 }
 
-// func getGraylog ()
+func getGraylog(cfg *Config) (*graylog.Graylog, error) {
+	if cfg.isMock {
+		return nil, errors.New("GOT EYM")
+	}
+
+	if cfg.UseTLS {
+		return getGraylogTLS(cfg)
+	}
+
+	// TODO fix this
+	return getGraylogTLS(cfg)
+}
 
 // getGraylog TODO
 func getGraylogTLS(cfg *Config) (*graylog.Graylog, error) {
@@ -100,16 +124,23 @@ func getGraylogTLS(cfg *Config) (*graylog.Graylog, error) {
 }
 
 func setProductionLogger(cfg *Config) error {
-	graylog, err := getGraylogTLS(cfg)
+	graylog, err := getGraylog(cfg)
 	if err != nil {
 		return err
 	}
 
 	zapProductionLogger := zap.New(
-		NewGelfCore(graylog),
+		NewGelfCore(cfg, graylog),
 		zap.AddCaller(),
 		zap.AddStacktrace(zapcore.ErrorLevel),
-		zap.Fields(zapcore.Field{Key: "Env", String: "production", Type: zapcore.StringType}))
+		zap.Fields(
+			zapcore.Field{
+				Key:    "Env",
+				String: cfg.GetEnvName(),
+				Type:   zapcore.StringType,
+			},
+		),
+	)
 
 	logger = zapProductionLogger
 
@@ -117,16 +148,22 @@ func setProductionLogger(cfg *Config) error {
 }
 
 func setStagingLogger(cfg *Config) error {
-	graylog, err := getGraylogTLS(cfg)
+	graylog, err := getGraylog(cfg)
 	if err != nil {
 		return err
 	}
 
 	zapProductionLogger := zap.New(
-		NewGelfCore(graylog),
+		NewGelfCore(cfg, graylog),
 		zap.AddCaller(),
 		zap.AddStacktrace(zapcore.ErrorLevel),
-		zap.Fields(zapcore.Field{Key: "Env", String: "staging", Type: zapcore.StringType}),
+		zap.Fields(
+			zapcore.Field{
+				Key:    "Env",
+				String: cfg.GetEnvName(),
+				Type:   zapcore.StringType,
+			},
+		),
 	)
 
 	logger = zapProductionLogger
@@ -136,7 +173,6 @@ func setStagingLogger(cfg *Config) error {
 
 func setDevelopmentLogger() {
 	config := zap.NewDevelopmentConfig()
-	// This allows us to have colored logs for development.
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	zapDevelopmentLogger, err := config.Build()
 	if err != nil {
@@ -149,19 +185,4 @@ func setDevelopmentLogger() {
 func setTestLogger() {
 	zapNopLogger := zap.NewNop()
 	logger = zapNopLogger
-}
-
-// DefaultGetIsProdEnv TODO
-func DefaultGetIsProdEnv() bool {
-	return false
-}
-
-// DefaultGetIsTest TODO
-func DefaultGetIsTest() bool {
-	return false
-}
-
-// DefaultGetIsStagingEnv TODO
-func DefaultGetIsStagingEnv() bool {
-	return false
 }

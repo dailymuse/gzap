@@ -13,11 +13,15 @@ import (
 type GelfCore struct {
 	Graylog *graylog.Graylog
 	Context []zapcore.Field
+	cfg     *Config
 }
 
 // NewGelfCore creates a new GelfCore with empty context
-func NewGelfCore(gl *graylog.Graylog) GelfCore {
-	return GelfCore{Graylog: gl}
+func NewGelfCore(cfg *Config, gl *graylog.Graylog) GelfCore {
+	return GelfCore{
+		Graylog: gl,
+		cfg:     cfg,
+	}
 }
 
 // map zapcore's log levels to standard syslog levels used by gelf, approximately
@@ -42,7 +46,7 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		"File":       entry.Caller.File,
 		"Line":       strconv.Itoa(entry.Caller.Line),
 		"LoggerName": entry.LoggerName,
-		"AppName":    "muselytics",
+		"AppName":    gc.cfg.GetAppName(),
 	}
 
 	// the order here is important,
@@ -56,7 +60,7 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	}
 
 	err = gc.Graylog.Send(graylog.Message{
-		Version:      "1.1",
+		Version:      gc.cfg.GraylogVersion,
 		Host:         hostname,
 		ShortMessage: entry.Message,
 		FullMessage:  entry.Stack,
