@@ -18,10 +18,8 @@ func TestNew(t *testing.T) {
 			"New should fail if Graylog fails to connect with Prod configuration",
 			args{
 				&Config{
-					GetIsProdEnv: func() bool {
-						return true
-					},
-					_isMock: true,
+					IsProdEnv: true,
+					_isMock:   true,
 				},
 			},
 			true,
