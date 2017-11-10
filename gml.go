@@ -12,10 +12,6 @@ var Logger = getLogger()
 // logger is the package level pointer to an instantied Logger.
 var logger *zap.Logger
 
-// Zap is an exported pointer to the go.uber.org/zap dependency used in the logger. Use this
-// to provide fields for the Logger using an internally compatible version of zap.
-var Zap = zap
-
 // New sets up the basic logger for either a Production or development
 // environment.
 func New(cfg *Config) error {
