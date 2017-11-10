@@ -8,7 +8,7 @@
 To use GMT, simply import:
 
 ```go
-    import "github.com/dailymuse/gml"
+import "github.com/dailymuse/gml"
 ```
 
 ### Example Usage

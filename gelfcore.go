@@ -10,13 +10,13 @@ import (
 // GelfCore implements the https://godoc.org/go.uber.org/zap/zapcore#Core interface
 // Messages are written to a graylog endpoint using the GELF format + protocol
 type GelfCore struct {
-	Graylog *graylog.Graylog
+	Graylog Graylog
 	Context []zapcore.Field
 	cfg     *Config
 }
 
 // NewGelfCore creates a new GelfCore with empty context
-func NewGelfCore(cfg *Config, gl *graylog.Graylog) GelfCore {
+func NewGelfCore(cfg *Config, gl Graylog) GelfCore {
 	return GelfCore{
 		Graylog: gl,
 		cfg:     cfg,

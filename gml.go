@@ -6,6 +6,7 @@ import (
 )
 
 // Logger is the global logger for the application.
+// TODO Write that it's memoized.
 var Logger = getLogger()
 
 // logger is the package level pointer to an instantied Logger.
@@ -24,7 +25,7 @@ func New(cfg *Config) error {
 
 	if cfg.IsStagingEnv {
 		if err := setStagingLogger(cfg); err != nil {
-			return nil
+			return err
 		}
 
 		return nil

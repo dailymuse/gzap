@@ -2,15 +2,20 @@ package gml
 
 import (
 	"crypto/tls"
-	"errors"
 
 	graylog "github.com/Devatoria/go-graylog"
 )
 
+// Graylog is a unifying interface for ...
+type Graylog interface {
+	Close() error
+	Send(graylog.Message) error
+}
+
 // NewGraylog TODO
-func NewGraylog(cfg *Config) (*graylog.Graylog, error) {
+func NewGraylog(cfg *Config) (Graylog, error) {
 	if cfg._isMock {
-		return nil, errors.New("fake error")
+		return cfg._mock, cfg._mockErr
 	}
 
 	if cfg.UseTLS {
@@ -21,7 +26,7 @@ func NewGraylog(cfg *Config) (*graylog.Graylog, error) {
 }
 
 // getGraylogTLS MORE TODO
-func getGraylogTLS(cfg *Config) (*graylog.Graylog, error) {
+func getGraylogTLS(cfg *Config) (Graylog, error) {
 	g, err := graylog.NewGraylogTLS(
 		graylog.Endpoint{
 			Transport: graylog.TCP,
@@ -42,7 +47,7 @@ func getGraylogTLS(cfg *Config) (*graylog.Graylog, error) {
 }
 
 // getGraylog TODO
-func getGraylog(cfg *Config) (*graylog.Graylog, error) {
+func getGraylog(cfg *Config) (Graylog, error) {
 	g, err := graylog.NewGraylog(
 		graylog.Endpoint{
 			Transport: graylog.TCP,
