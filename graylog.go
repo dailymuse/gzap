@@ -20,7 +20,7 @@ func NewGraylog(cfg *Config) (*graylog.Graylog, error) {
 	return getGraylog(cfg)
 }
 
-// getGraylogTLS TODO
+// getGraylogTLS MORE TODO
 func getGraylogTLS(cfg *Config) (*graylog.Graylog, error) {
 	g, err := graylog.NewGraylogTLS(
 		graylog.Endpoint{
