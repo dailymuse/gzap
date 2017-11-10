@@ -13,7 +13,7 @@ func NewGraylog(cfg *Config) (*graylog.Graylog, error) {
 		return nil, errors.New("fake error")
 	}
 
-	if cfg.GetUseTLS() {
+	if cfg.UseTLS {
 		return getGraylogTLS(cfg)
 	}
 
@@ -25,12 +25,12 @@ func getGraylogTLS(cfg *Config) (*graylog.Graylog, error) {
 	g, err := graylog.NewGraylogTLS(
 		graylog.Endpoint{
 			Transport: graylog.TCP,
-			Address:   cfg.GetGraylogAddress(),
-			Port:      cfg.GetGraylogPort(),
+			Address:   cfg.GraylogAddress,
+			Port:      cfg.GraylogPort,
 		},
-		cfg.GetGraylogConnectionTimeout(),
+		cfg.GraylogConnectionTimeout,
 		&tls.Config{
-			InsecureSkipVerify: cfg.GetInsecureSkipVerify(),
+			InsecureSkipVerify: cfg.InsecureSkipVerify,
 		},
 	)
 
@@ -46,8 +46,8 @@ func getGraylog(cfg *Config) (*graylog.Graylog, error) {
 	g, err := graylog.NewGraylog(
 		graylog.Endpoint{
 			Transport: graylog.TCP,
-			Address:   cfg.GetGraylogAddress(),
-			Port:      cfg.GetGraylogPort(),
+			Address:   cfg.GraylogAddress,
+			Port:      cfg.GraylogPort,
 		},
 	)
 

@@ -4,50 +4,50 @@ import "time"
 
 // Config TODO
 type Config struct {
-	GetAppName                  func() string
-	GetIsProdEnv                func() bool
-	GetIsStagingEnv             func() bool
-	GetIsTestEnv                func() bool
-	GetGraylogAddress           func() string
-	GetGraylogPort              func() uint
-	GetGraylogVersion           func() string
-	GetHostname                 func() string
-	GetUseTLS                   func() bool
-	GetInsecureSkipVerify       func() bool
-	GetLogEnvName               func() string
-	GetGraylogConnectionTimeout func() time.Duration
-	_isMock                     bool
-	_mockErr                    string
+	AppName                  string
+	IsProdEnv                bool
+	IsStagingEnv             bool
+	IsTestEnv                bool
+	GraylogAddress           string
+	GraylogPort              uint
+	GraylogVersion           string
+	Hostname                 string
+	UseTLS                   bool
+	InsecureSkipVerify       bool
+	LogEnvName               string
+	GraylogConnectionTimeout time.Duration
+	_isMock                  bool
+	_mockErr                 string
 }
 
 // NewConfig TODO
 func NewConfig(
-	GetAppName func() string,
-	GetIsProdEnv func() bool,
-	GetIsStagingEnv func() bool,
-	GetIsTestEnv func() bool,
-	GetGraylogAddress func() string,
-	GetGraylogPort func() uint,
-	GetGraylogVersion func() string,
-	GetHostname func() string,
-	GetUseTLS func() bool,
-	GetInsecureSkipVerify func() bool,
-	GetLogEnvName func() string,
-	GetGraylogConnectionTimeout func() time.Duration,
+	AppName string,
+	IsProdEnv bool,
+	IsStagingEnv bool,
+	IsTestEnv bool,
+	GraylogAddress string,
+	GraylogPort uint,
+	GraylogVersion string,
+	Hostname string,
+	UseTLS bool,
+	InsecureSkipVerify bool,
+	LogEnvName string,
+	GraylogConnectionTimeout time.Duration,
 ) *Config {
 	return &Config{
-		GetAppName,
-		GetIsProdEnv,
-		GetIsStagingEnv,
-		GetIsTestEnv,
-		GetGraylogAddress,
-		GetGraylogPort,
-		GetGraylogVersion,
-		GetHostname,
-		GetUseTLS,
-		GetInsecureSkipVerify,
-		GetLogEnvName,
-		GetGraylogConnectionTimeout,
+		AppName,
+		IsProdEnv,
+		IsStagingEnv,
+		IsTestEnv,
+		GraylogAddress,
+		GraylogPort,
+		GraylogVersion,
+		Hostname,
+		UseTLS,
+		InsecureSkipVerify,
+		LogEnvName,
+		GraylogConnectionTimeout,
 		false,
 		"",
 	}
@@ -56,14 +56,8 @@ func NewConfig(
 // NewDefaultTestConfig TODO
 func NewDefaultTestConfig() *Config {
 	return &Config{
-		GetIsProdEnv: func() bool {
-			return false
-		},
-		GetIsStagingEnv: func() bool {
-			return false
-		},
-		GetIsTestEnv: func() bool {
-			return true
-		},
+		IsProdEnv:    false,
+		IsStagingEnv: false,
+		IsTestEnv:    false,
 	}
 }

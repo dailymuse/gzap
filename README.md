@@ -13,45 +13,23 @@ import (
 )
 
 func main() {
-    err := gml.New(&gml.Config{
-        GetAppName: func() string {
+    if err := gml.New(&gml.Config{
+        AppName: "app-name",
+        IsProdEnv: true,
+        IsStagingEnv: false,
+        IsTestEnv: false,
+        GraylogAddress: "127.0.0.1",
+        GraylogPort: 1234,
+        GraylogVersion: "1.1",
+        Hostname: "myhostname",
+        UseTLS: true,
+        InsecureSkipVerify: true,
+        LogEnvName: "prod",
+        GraylogConnectionTimeout: time.Second * 3,
+    }); err != nil {
+        panic(err)
+    }
 
-        },
-        GetIsProdEnv: func() bool {
-
-        },
-        GetIsStagingEnv: func() bool {
-
-        },
-        GetIsTestEnv: func() bool {
-
-        },
-        GetGraylogAddress: func() string {
-
-        },
-        GetGraylogPort: func() uint {
-
-        },
-        GetGraylogVersion: func() string {
-
-        },
-        GetHostname: func() string {
-
-        },
-        GetUseTLS: func() bool {
-
-        },
-        GetInsecureSkipVerify: func() bool {
-
-        },
-        GetLogEnvName: func() string {
-
-        },
-        GetGraylogConnectionTimeout: func() time.Duration {
-            
-        },
-    })
-
-    gomuselog.Logger.Info()
+    gml.Logger.Info(..)
 }
 ```

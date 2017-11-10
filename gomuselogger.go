@@ -14,7 +14,7 @@ var logger *zap.Logger
 // New sets up the basic logger for either a Production or development
 // environment.
 func New(cfg *Config) error {
-	if cfg.GetIsProdEnv() {
+	if cfg.IsProdEnv {
 		if err := setProductionLogger(cfg); err != nil {
 			return err
 		}
@@ -22,7 +22,7 @@ func New(cfg *Config) error {
 		return nil
 	}
 
-	if cfg.GetIsStagingEnv() {
+	if cfg.IsStagingEnv {
 		if err := setStagingLogger(cfg); err != nil {
 			return nil
 		}
@@ -30,7 +30,7 @@ func New(cfg *Config) error {
 		return nil
 	}
 
-	if cfg.GetIsTestEnv() {
+	if cfg.IsTestEnv {
 		setTestLogger()
 		return nil
 	}
@@ -66,7 +66,7 @@ func setProductionLogger(cfg *Config) error {
 		zap.Fields(
 			zapcore.Field{
 				Key:    "Env",
-				String: cfg.GetLogEnvName(),
+				String: cfg.LogEnvName,
 				Type:   zapcore.StringType,
 			},
 		),
@@ -90,7 +90,7 @@ func setStagingLogger(cfg *Config) error {
 		zap.Fields(
 			zapcore.Field{
 				Key:    "Env",
-				String: cfg.GetLogEnvName(),
+				String: cfg.LogEnvName,
 				Type:   zapcore.StringType,
 			},
 		),

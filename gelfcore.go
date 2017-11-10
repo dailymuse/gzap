@@ -41,7 +41,7 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		"File":       entry.Caller.File,
 		"Line":       strconv.Itoa(entry.Caller.Line),
 		"LoggerName": entry.LoggerName,
-		"AppName":    gc.cfg.GetAppName(),
+		"AppName":    gc.cfg.AppName,
 	}
 
 	// the order here is important,
@@ -55,8 +55,8 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	}
 
 	if err := gc.Graylog.Send(graylog.Message{
-		Version:      gc.cfg.GetGraylogVersion(),
-		Host:         gc.cfg.GetHostname(),
+		Version:      gc.cfg.GraylogVersion,
+		Host:         gc.cfg.Hostname,
 		ShortMessage: entry.Message,
 		FullMessage:  entry.Stack,
 		Timestamp:    entry.Time.Unix(),
