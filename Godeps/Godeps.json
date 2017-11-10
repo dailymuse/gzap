@@ -1,0 +1,80 @@
+{
+	"ImportPath": ".",
+	"GoVersion": "go1.9",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/Devatoria/go-graylog",
+			"Rev": "c16c35c9383bbd01d20268003115d7861c92f807"
+		},
+		{
+			"ImportPath": "github.com/Jeffail/gabs",
+			"Comment": "1.0-24-g44cbc27",
+			"Rev": "44cbc27138518b15305cb3eef220d04f2d641b9b"
+		},
+		{
+			"ImportPath": "github.com/davecgh/go-spew/spew",
+			"Comment": "v1.1.0-1-g782f496",
+			"Rev": "782f4967f2dc4564575ca782fe2d04090b5faca8"
+		},
+		{
+			"ImportPath": "github.com/pmezard/go-difflib/difflib",
+			"Comment": "v1.0.0",
+			"Rev": "792786c7400a136282c1664665ae0a8db921c6c2"
+		},
+		{
+			"ImportPath": "github.com/stretchr/objx",
+			"Rev": "1a9d0bb9f541897e62256577b352fdbc1fb4fd94"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.1.4-66-gf6abca5",
+			"Rev": "f6abca593680b2315d2075e0f5e2a9751e3f431a"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/mock",
+			"Comment": "v1.1.4-66-gf6abca5",
+			"Rev": "f6abca593680b2315d2075e0f5e2a9751e3f431a"
+		},
+		{
+			"ImportPath": "go.uber.org/atomic",
+			"Comment": "v1.2.0-9-g70bd126",
+			"Rev": "70bd1261d36be490ebd22a62b385a3c5d23b6240"
+		},
+		{
+			"ImportPath": "go.uber.org/multierr",
+			"Comment": "v1.1.0",
+			"Rev": "3c4937480c32f4c13a875a1829af76c98ca3d40a"
+		},
+		{
+			"ImportPath": "go.uber.org/zap",
+			"Comment": "v1.5.0-3-ge68420e",
+			"Rev": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b"
+		},
+		{
+			"ImportPath": "go.uber.org/zap/buffer",
+			"Comment": "v1.5.0-3-ge68420e",
+			"Rev": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b"
+		},
+		{
+			"ImportPath": "go.uber.org/zap/internal/bufferpool",
+			"Comment": "v1.5.0-3-ge68420e",
+			"Rev": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b"
+		},
+		{
+			"ImportPath": "go.uber.org/zap/internal/color",
+			"Comment": "v1.5.0-3-ge68420e",
+			"Rev": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b"
+		},
+		{
+			"ImportPath": "go.uber.org/zap/internal/exit",
+			"Comment": "v1.5.0-3-ge68420e",
+			"Rev": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b"
+		},
+		{
+			"ImportPath": "go.uber.org/zap/zapcore",
+			"Comment": "v1.5.0-3-ge68420e",
+			"Rev": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b"
+		}
+	]
+}
