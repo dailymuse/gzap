@@ -1,0 +1,14 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.8
+      
+    working_directory: /go/src/github.com/dailymuse/gml
+    steps:
+      - checkout
+
+      # specify any bash command here prefixed with `run: `
+      - run: go get -v -t -d ./...
+      - run: go test -v ./...
+      - run: ./code-cov-test.sh && bash <(curl -s https://codecov.io/bash)
