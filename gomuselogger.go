@@ -1,4 +1,4 @@
-package gomuselogger
+package gml
 
 import (
 	"go.uber.org/zap"

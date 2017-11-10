@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: circleci/golang:1.8
       
-    working_directory: /go/src/github.com/dailymuse/gomuselogger
+    working_directory: /go/src/github.com/dailymuse/gml
     steps:
       - checkout
 

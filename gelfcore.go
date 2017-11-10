@@ -1,4 +1,4 @@
-package gomuselogger
+package gml
 
 import (
 	"strconv"
