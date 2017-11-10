@@ -23,6 +23,7 @@ import (
 )
 
 func main() {
+    // Instantiate a global logger.
     if err := gml.New(&gml.Config{
         AppName: "app-name",
         IsProdEnv: true,
@@ -40,6 +41,18 @@ func main() {
         panic(err)
     }
 
-    gml.Logger.Info(..)
+    // Example Info log.
+    gml.Logger.Info("this is an example Info log",
+		gml.Error(errors.New("example error")),
+		gml.String("process name", "some-fake-name"),
+	)
+
+    // Example Error log.
+    gml.Logger.Error("this is an example Error log",
+        gml.Int64("docsUploaded", int64(100)),
+        gml.Int64("expectedDocs", int64(255)),
+        gml.String("index name", "my-full-index-name"),
+        gml.Float64("time elapsed", float64(1002)),
+    )
 }
 ```
