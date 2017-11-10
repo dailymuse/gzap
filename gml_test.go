@@ -68,9 +68,7 @@ func TestNew(t *testing.T) {
 		{
 			"New should pass if using test configuration",
 			args{
-				&Config{
-					IsTestEnv: true,
-				},
+				NewDefaultTestConfig(),
 			},
 			false,
 			"",
