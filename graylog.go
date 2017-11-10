@@ -6,13 +6,15 @@ import (
 	graylog "github.com/Devatoria/go-graylog"
 )
 
-// Graylog is a unifying interface for ...
+// Graylog is a unifying interface for using the internal
+// Graylog package 'github.com/Devatoria/go-graylog', while
+// also being able to use Mocks in it's place.
 type Graylog interface {
 	Close() error
 	Send(graylog.Message) error
 }
 
-// NewGraylog TODO
+// NewGraylog returns a new Graylog instance.
 func NewGraylog(cfg *Config) (Graylog, error) {
 	if cfg._isMock {
 		return cfg._mock, cfg._mockErr
@@ -25,7 +27,6 @@ func NewGraylog(cfg *Config) (Graylog, error) {
 	return getGraylog(cfg)
 }
 
-// getGraylogTLS MORE TODO
 func getGraylogTLS(cfg *Config) (Graylog, error) {
 	g, err := graylog.NewGraylogTLS(
 		graylog.Endpoint{
@@ -46,7 +47,6 @@ func getGraylogTLS(cfg *Config) (Graylog, error) {
 	return g, nil
 }
 
-// getGraylog TODO
 func getGraylog(cfg *Config) (Graylog, error) {
 	g, err := graylog.NewGraylog(
 		graylog.Endpoint{

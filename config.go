@@ -2,7 +2,8 @@ package gml
 
 import "time"
 
-// Config TODO
+// Config represents all the logger configurations available
+// when instaniating a new Logger.
 type Config struct {
 	AppName                  string
 	IsProdEnv                bool
@@ -21,7 +22,7 @@ type Config struct {
 	_mockErr                 error
 }
 
-// NewConfig TODO
+// NewConfig returns a new logging Config with the supplied arugments.
 func NewConfig(
 	AppName string,
 	IsProdEnv bool,
@@ -55,7 +56,7 @@ func NewConfig(
 	}
 }
 
-// NewDefaultTestConfig TODO
+// NewDefaultTestConfig returns a noop logging Config used for run testing.
 func NewDefaultTestConfig() *Config {
 	return &Config{
 		IsProdEnv:    false,

@@ -5,16 +5,15 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// Logger is the global logger for the application.
-// TODO Write that it's memoized.
+// Logger is the global logger for the application. Upon first initalization of
+// the logger all calls to 'getLogger' are memoized with the instantiated 'logger'.
 var Logger = getLogger()
 
 // logger is the package level pointer to an instantied Logger.
 var logger *zap.Logger
 
-// New sets up the basic logger for either a Production or development
-// environment.
-func New(cfg *Config) error {
+// Init initializes a global Logger based upon the configurations you pass in.
+func Init(cfg *Config) error {
 	if cfg.IsProdEnv {
 		if err := setProductionLogger(cfg); err != nil {
 			return err
@@ -43,12 +42,15 @@ func New(cfg *Config) error {
 	return nil
 }
 
-// getLogger is an internal function that fetches a reference to an instantied Logger,
-// or inits a new logger.
-// TODO mention that it assumes an ENV is a test env if none is given.
+// getLogger is an internal function that returns an instantied Logger,
+// or inits a new logger with default test configuration.
+//
+// This is because tests that run application code that use the logger will
+// need an instaniated Logger to run. In this case we want to make sure we
+// use a no-op logger, to reduce test noise.
 func getLogger() *zap.Logger {
 	if logger == nil {
-		New(NewDefaultTestConfig())
+		Init(NewDefaultTestConfig())
 	}
 
 	return logger

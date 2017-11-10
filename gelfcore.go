@@ -15,7 +15,7 @@ type GelfCore struct {
 	cfg     *Config
 }
 
-// NewGelfCore creates a new GelfCore with empty context
+// NewGelfCore creates a new GelfCore with empty context.
 func NewGelfCore(cfg *Config, gl Graylog) GelfCore {
 	return GelfCore{
 		Graylog: gl,
@@ -23,7 +23,7 @@ func NewGelfCore(cfg *Config, gl Graylog) GelfCore {
 	}
 }
 
-// map zapcore's log levels to standard syslog levels used by gelf, approximately
+// map zapcore's log levels to standard syslog levels used by gelf, approximately.
 var zapToSyslog = map[zapcore.Level]uint{
 	zapcore.DebugLevel:  7,
 	zapcore.InfoLevel:   6,
@@ -34,8 +34,7 @@ var zapToSyslog = map[zapcore.Level]uint{
 	zapcore.FatalLevel:  1,
 }
 
-// Write the message to the endpoint
-// TODO test this method
+// Write writes messages to the configured Graylog endpoint.
 func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	extraFields := map[string]string{
 		"File":       entry.Caller.File,
@@ -69,7 +68,7 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	return nil
 }
 
-// With adds structured context to the logger
+// With adds structured context to the logger.
 func (gc GelfCore) With(fields []zapcore.Field) zapcore.Core {
 	return GelfCore{
 		Graylog: gc.Graylog,
@@ -77,12 +76,12 @@ func (gc GelfCore) With(fields []zapcore.Field) zapcore.Core {
 	}
 }
 
-// Sync is a no-op for us
+// Sync is a no-op.
 func (gc GelfCore) Sync() error {
 	return nil
 }
 
-// Check determines whether the supplied entry should be logged
+// Check determines whether the supplied entry should be logged.
 func (gc GelfCore) Check(entry zapcore.Entry, checkedEntry *zapcore.CheckedEntry) *zapcore.CheckedEntry {
 	if gc.Enabled(entry.Level) {
 		return checkedEntry.AddCore(entry, gc)
@@ -91,7 +90,7 @@ func (gc GelfCore) Check(entry zapcore.Entry, checkedEntry *zapcore.CheckedEntry
 	return checkedEntry
 }
 
-// Enabled only enables info messages and above
+// Enabled only enables info messages and above.
 func (gc GelfCore) Enabled(level zapcore.Level) bool {
 	return zapcore.InfoLevel.Enabled(level)
 }

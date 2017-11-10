@@ -5,12 +5,12 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// MockGraylog TODO
+// MockGraylog is a mock Graylog struct used for testing.
 type MockGraylog struct {
 	mock.Mock
 }
 
-// NewMockGraylog TODO
+// NewMockGraylog returns a new MockGraylog struct.
 func NewMockGraylog() MockGraylog {
 	return MockGraylog{}
 }
