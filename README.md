@@ -5,7 +5,7 @@
 
 ### Getting Stated
 
-To use GMT, simply import:
+To use gml, simply import:
 
 ```go
 import "github.com/dailymuse/gml"
