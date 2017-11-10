@@ -43,9 +43,9 @@ func main() {
 
     // Example Info log.
     gml.Logger.Info("this is an example Info log",
-		gml.Error(errors.New("example error")),
-		gml.String("process name", "some-fake-name"),
-	)
+        gml.Error(errors.New("example error")),
+        gml.String("process name", "some-fake-name"),
+    )
 
     // Example Error log.
     gml.Logger.Error("this is an example Error log",
