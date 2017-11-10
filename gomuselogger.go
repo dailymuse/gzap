@@ -1,43 +1,15 @@
 package gomuselogger
 
 import (
-	"crypto/tls"
-	"errors"
-	"time"
-
-	"github.com/Devatoria/go-graylog"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 // Logger is the global logger for the application.
-var (
-	Logger = getLogger()
-)
+var Logger = getLogger()
 
 // logger is the package level pointer to an instantied Logger.
-var (
-	logger *zap.Logger
-)
-
-// graylogConnectionTimeout TODO
-var graylogConnectionTimeout = 3 * time.Second
-
-// Config write the logs here TODO
-type Config struct {
-	GetAppName         func() string
-	GetIsProdEnv       func() bool
-	GetIsStagingEnv    func() bool
-	GetIsTestEnv       func() bool
-	GraylogAddress     string
-	GraylogPort        uint
-	GraylogVersion     string
-	GetHostname        func() string
-	UseTLS             bool
-	InsecureSkipVerify bool
-	GetEnvName         func() string
-	isMock             bool
-}
+var logger *zap.Logger
 
 // New sets up the basic logger for either a Production or development
 // environment.
@@ -63,6 +35,8 @@ func New(cfg *Config) error {
 		return nil
 	}
 
+	// By default if we can't determine the environment explicitly we'll
+	// use the development logger.
 	setDevelopmentLogger()
 
 	return nil
@@ -73,58 +47,14 @@ func New(cfg *Config) error {
 // TODO mention that it assumes an ENV is a test env if none is given.
 func getLogger() *zap.Logger {
 	if logger == nil {
-		New(&Config{
-			GetIsProdEnv: func() bool {
-				return false
-			},
-			GetIsStagingEnv: func() bool {
-				return false
-			},
-			GetIsTestEnv: func() bool {
-				return true
-			},
-		})
+		New(NewDefaultTestConfig())
 	}
 
 	return logger
 }
 
-func getGraylog(cfg *Config) (*graylog.Graylog, error) {
-	if cfg.isMock {
-		return nil, errors.New("GOT EYM")
-	}
-
-	if cfg.UseTLS {
-		return getGraylogTLS(cfg)
-	}
-
-	// TODO fix this
-	return getGraylogTLS(cfg)
-}
-
-// getGraylog TODO
-func getGraylogTLS(cfg *Config) (*graylog.Graylog, error) {
-	g, err := graylog.NewGraylogTLS(
-		graylog.Endpoint{
-			Transport: graylog.TCP,
-			Address:   cfg.GraylogAddress,
-			Port:      cfg.GraylogPort,
-		},
-		graylogConnectionTimeout,
-		&tls.Config{
-			InsecureSkipVerify: cfg.InsecureSkipVerify,
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return g, nil
-}
-
 func setProductionLogger(cfg *Config) error {
-	graylog, err := getGraylog(cfg)
+	graylog, err := NewGraylog(cfg)
 	if err != nil {
 		return err
 	}
@@ -136,7 +66,7 @@ func setProductionLogger(cfg *Config) error {
 		zap.Fields(
 			zapcore.Field{
 				Key:    "Env",
-				String: cfg.GetEnvName(),
+				String: cfg.GetLogEnvName(),
 				Type:   zapcore.StringType,
 			},
 		),
@@ -148,7 +78,7 @@ func setProductionLogger(cfg *Config) error {
 }
 
 func setStagingLogger(cfg *Config) error {
-	graylog, err := getGraylog(cfg)
+	graylog, err := NewGraylog(cfg)
 	if err != nil {
 		return err
 	}
@@ -160,7 +90,7 @@ func setStagingLogger(cfg *Config) error {
 		zap.Fields(
 			zapcore.Field{
 				Key:    "Env",
-				String: cfg.GetEnvName(),
+				String: cfg.GetLogEnvName(),
 				Type:   zapcore.StringType,
 			},
 		),
@@ -172,9 +102,9 @@ func setStagingLogger(cfg *Config) error {
 }
 
 func setDevelopmentLogger() {
-	config := zap.NewDevelopmentConfig()
-	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	zapDevelopmentLogger, err := config.Build()
+	Config := zap.NewDevelopmentConfig()
+	Config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	zapDevelopmentLogger, err := Config.Build()
 	if err != nil {
 		panic(err)
 	}

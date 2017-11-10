@@ -1,7 +1,6 @@
 package gomuselogger
 
 import (
-	"os"
 	"strconv"
 
 	"github.com/Devatoria/go-graylog"
@@ -36,12 +35,8 @@ var zapToSyslog = map[zapcore.Level]uint{
 }
 
 // Write the message to the endpoint
+// TODO test this method
 func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
-	// TODO Fix this
-	hostname, err := os.Hostname()
-	if err != nil {
-		return err
-	}
 	extraFields := map[string]string{
 		"File":       entry.Caller.File,
 		"Line":       strconv.Itoa(entry.Caller.Line),
@@ -59,16 +54,19 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		extraFields[field.Key] = field.String
 	}
 
-	err = gc.Graylog.Send(graylog.Message{
-		Version:      gc.cfg.GraylogVersion,
-		Host:         hostname,
+	if err := gc.Graylog.Send(graylog.Message{
+		Version:      gc.cfg.GetGraylogVersion(),
+		Host:         gc.cfg.GetHostname(),
 		ShortMessage: entry.Message,
 		FullMessage:  entry.Stack,
 		Timestamp:    entry.Time.Unix(),
 		Level:        zapToSyslog[entry.Level],
 		Extra:        extraFields,
-	})
-	return err
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // With adds structured context to the logger

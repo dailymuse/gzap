@@ -1,7 +1,6 @@
 package gomuselogger
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -16,13 +15,13 @@ func TestNew(t *testing.T) {
 		err     string
 	}{
 		{
-			"my first test",
+			"New should fail if Graylog fails to connect with Prod configuration",
 			args{
 				&Config{
 					GetIsProdEnv: func() bool {
 						return true
 					},
-					isMock: true,
+					_isMock: true,
 				},
 			},
 			true,
@@ -34,9 +33,6 @@ func TestNew(t *testing.T) {
 			if err := New(tt.args.cfg); tt.wantErr && err.Error() != tt.err {
 				t.Errorf("New() error = \"%v\", wantErrString \"%v\"", err, tt.err)
 			}
-
-			err := New(tt.args.cfg)
-			fmt.Println(err.Error())
 		})
 	}
 }
