@@ -2,6 +2,17 @@
 
 [![GoDoc](https://godoc.org/github.com/dailymuse/gml?status.svg)](https://godoc.org/github.com/dailymuse/gml) [![CircleCI](https://circleci.com/gh/dailymuse/gml.svg?style=svg)](https://circleci.com/gh/dailymuse/gml) [![codecov](https://codecov.io/gh/dailymuse/gml/branch/master/graph/badge.svg)](https://codecov.io/gh/dailymuse/gml)
 
+
+### Getting Stated
+
+To use gml, simply import:
+
+```go
+import "github.com/dailymuse/gml"
+```
+
+### Example Usage
+
 ```go
 package main
 

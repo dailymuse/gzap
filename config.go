@@ -17,7 +17,8 @@ type Config struct {
 	LogEnvName               string
 	GraylogConnectionTimeout time.Duration
 	_isMock                  bool
-	_mockErr                 string
+	_mock                    Graylog
+	_mockErr                 error
 }
 
 // NewConfig TODO
@@ -49,7 +50,8 @@ func NewConfig(
 		LogEnvName,
 		GraylogConnectionTimeout,
 		false,
-		"",
+		nil,
+		nil,
 	}
 }
 
