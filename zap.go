@@ -2,9 +2,6 @@ package gml
 
 import "go.uber.org/zap"
 
-// Fields adds fields to the Logger.
-var Fields = zap.Fields
-
 // Any takes a key and an arbitrary value and chooses the best way to represent
 // them as a field, falling back to a reflection-based approach only if
 // necessary.
