@@ -25,7 +25,7 @@ func TestNew(t *testing.T) {
 				},
 			},
 			true,
-			"something",
+			"fake error",
 		},
 	}
 	for _, tt := range tests {
