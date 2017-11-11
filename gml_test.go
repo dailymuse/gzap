@@ -3,9 +3,10 @@ package gml
 import (
 	"errors"
 	"testing"
+	"time"
 )
 
-func TestNew(t *testing.T) {
+func TestInit(t *testing.T) {
 	type args struct {
 		cfg *Config
 	}
@@ -76,7 +77,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := New(tt.args.cfg)
+			err := Init(tt.args.cfg)
 
 			if tt.wantErr && err == nil {
 				t.Errorf("New() expected error = \"%v\"; got \"nil\"", tt.err)
@@ -87,4 +88,27 @@ func TestNew(t *testing.T) {
 			}
 		})
 	}
+}
+
+func ExampleInit() {
+	if err := Init(&Config{
+		AppName:                  "",
+		IsProdEnv:                false,
+		IsStagingEnv:             false,
+		IsTestEnv:                false,
+		GraylogAddress:           "",
+		GraylogPort:              0,
+		GraylogVersion:           "",
+		Hostname:                 "",
+		UseTLS:                   false,
+		InsecureSkipVerify:       false,
+		LogEnvName:               "",
+		GraylogConnectionTimeout: time.Second * 0,
+	}); err != nil {
+		panic(err)
+	}
+
+	defer Logger.Sync()
+
+	Logger.Info("this is a test info log")
 }
