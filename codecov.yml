@@ -1,0 +1,10 @@
+codecov:
+  branch: master
+
+comment: true
+  
+coverage:
+  status:
+    project: no
+    patch: no
+    changes: no
