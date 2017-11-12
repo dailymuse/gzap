@@ -17,7 +17,7 @@ func TestInit(t *testing.T) {
 		err     string
 	}{
 		{
-			"New should fail if Graylog fails to connect with Prod configuration",
+			"Init should fail if Graylog fails to connect with Prod configuration",
 			args{
 				&Config{
 					IsProdEnv: true,
@@ -29,7 +29,7 @@ func TestInit(t *testing.T) {
 			"could not connect to Graylog",
 		},
 		{
-			"New should pass if Graylog connects with Prod configuration",
+			"Init should pass if Graylog connects with Prod configuration",
 			args{
 				&Config{
 					IsProdEnv: true,
@@ -42,7 +42,7 @@ func TestInit(t *testing.T) {
 			"",
 		},
 		{
-			"New should fail if Graylog fails to connect with Staging configuration",
+			"Init should fail if Graylog fails to connect with Staging configuration",
 			args{
 				&Config{
 					IsStagingEnv: true,
@@ -54,7 +54,7 @@ func TestInit(t *testing.T) {
 			"could not connect to Graylog",
 		},
 		{
-			"New should pass if Graylog connects with Staging configuration",
+			"Init should pass if Graylog connects with Staging configuration",
 			args{
 				&Config{
 					IsStagingEnv: true,
@@ -67,12 +67,30 @@ func TestInit(t *testing.T) {
 			"",
 		},
 		{
-			"New should pass if using test configuration",
+			"Init should pass if using test configuration",
 			args{
 				NewDefaultTestConfig(),
 			},
 			false,
 			"",
+		},
+		{
+			"Init should pass if using dev configuration",
+			args{
+				&Config{
+					IsDevEnv: true,
+				},
+			},
+			false,
+			"",
+		},
+		{
+			"Init should fail if no configuration is passed",
+			args{
+				&Config{},
+			},
+			true,
+			"no env was explicity set, and not currently running tests",
 		},
 	}
 	for _, tt := range tests {
@@ -80,11 +98,11 @@ func TestInit(t *testing.T) {
 			err := Init(tt.args.cfg)
 
 			if tt.wantErr && err == nil {
-				t.Errorf("New() expected error = \"%v\"; got \"nil\"", tt.err)
+				t.Errorf("Init() expected error = \"%v\"; got \"nil\"", tt.err)
 			}
 
 			if err != nil && err.Error() != tt.err {
-				t.Errorf("New() expected error = \"%v\";  got \"%v\"", tt.err, err.Error())
+				t.Errorf("Init() expected error = \"%v\";  got \"%v\"", tt.err, err.Error())
 			}
 		})
 	}

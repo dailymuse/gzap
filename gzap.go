@@ -1,6 +1,8 @@
 package gzap
 
 import (
+	"errors"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -12,7 +14,10 @@ var Logger = getLogger()
 // logger is the package level pointer to an instantied Logger.
 var logger *zap.Logger
 
-// Init initializes a global Logger based upon the configurations you pass in.
+var envNotSetErrorString = "no env was explicity set, and not currently running tests"
+
+// Init initializes a global Logger based upon the configurations you pass in. If no env is
+// specifically set, or found (in the case of TestEnv), then it will return an error.
 func Init(cfg *Config) error {
 	if cfg.IsProdEnv {
 		if err := setProductionLogger(cfg); err != nil {
@@ -30,16 +35,17 @@ func Init(cfg *Config) error {
 		return nil
 	}
 
+	if cfg.IsDevEnv {
+		setDevelopmentLogger()
+		return nil
+	}
+
 	if cfg.IsTestEnv {
 		setTestLogger()
 		return nil
 	}
 
-	// By default if we can't determine the environment explicitly we'll
-	// use the development logger.
-	setDevelopmentLogger()
-
-	return nil
+	return errors.New(envNotSetErrorString)
 }
 
 // getLogger is an internal function that returns an instantied Logger,

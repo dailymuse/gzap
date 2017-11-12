@@ -9,6 +9,7 @@ type Config struct {
 	IsProdEnv                bool
 	IsStagingEnv             bool
 	IsTestEnv                bool
+	IsDevEnv                 bool
 	GraylogAddress           string
 	GraylogPort              uint
 	GraylogVersion           string
@@ -28,6 +29,7 @@ func NewConfig(
 	IsProdEnv bool,
 	IsStagingEnv bool,
 	IsTestEnv bool,
+	IsDevEnv bool,
 	GraylogAddress string,
 	GraylogPort uint,
 	GraylogVersion string,
@@ -42,6 +44,7 @@ func NewConfig(
 		IsProdEnv,
 		IsStagingEnv,
 		IsTestEnv,
+		IsDevEnv,
 		GraylogAddress,
 		GraylogPort,
 		GraylogVersion,
@@ -61,6 +64,7 @@ func NewDefaultTestConfig() *Config {
 	return &Config{
 		IsProdEnv:    false,
 		IsStagingEnv: false,
-		IsTestEnv:    false,
+		IsTestEnv:    true,
+		IsDevEnv:     false,
 	}
 }

@@ -17,9 +17,9 @@ import "github.com/dailymuse/gzap"
 package main
 
 import (
-	"time"
+    "time"
 
-	"github.com/dailymuse/gzap"
+    "github.com/dailymuse/gzap"
 )
 
 func main() {
@@ -43,16 +43,21 @@ func main() {
 
     // Example Info log.
     gzap.Logger.Info("this is an example Info log",
-        gzap.Error(errors.New("example error")),
         gzap.String("process name", "some-fake-name"),
+        gzap.Int64("expectedDocs", int64(255)),
+        gzap.Int64("docsUploaded", int64(100)),
     )
 
     // Example Error log.
     gzap.Logger.Error("this is an example Error log",
-        gzap.Int64("docsUploaded", int64(100)),
-        gzap.Int64("expectedDocs", int64(255)),
+        gzap.Error(errors.New("example error")),
         gzap.String("index name", "my-full-index-name"),
         gzap.Float64("time elapsed", float64(1002)),
+    )
+
+    // Example Debug log.
+    gzap.Logger.Error("this is an example Debug log",
+        gzap.String("variable", "some-variable-here"),
     )
 }
 ```
