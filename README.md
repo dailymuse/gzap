@@ -1,14 +1,14 @@
-# Go Muse Logger
+# gzap - Graylog Integrated Zap Logger
 
-[![GoDoc](https://godoc.org/github.com/dailymuse/gml?status.svg)](https://godoc.org/github.com/dailymuse/gml) [![CircleCI](https://circleci.com/gh/dailymuse/gml.svg?style=svg)](https://circleci.com/gh/dailymuse/gml) [![codecov](https://codecov.io/gh/dailymuse/gml/branch/master/graph/badge.svg)](https://codecov.io/gh/dailymuse/gml)
+[![GoDoc](https://godoc.org/github.com/dailymuse/gzap?status.svg)](https://godoc.org/github.com/dailymuse/gzap) [![CircleCI](https://circleci.com/gh/dailymuse/gzap.svg?style=svg)](https://circleci.com/gh/dailymuse/gzap) [![codecov](https://codecov.io/gh/dailymuse/gzap/branch/master/graph/badge.svg)](https://codecov.io/gh/dailymuse/gzap)
 
 
 ### Getting Stated
 
-To use gml, simply import:
+To use gzap, simply import:
 
 ```go
-import "github.com/dailymuse/gml"
+import "github.com/dailymuse/gzap"
 ```
 
 ### Example Usage
@@ -19,12 +19,12 @@ package main
 import (
 	"time"
 
-	"github.com/dailymuse/gml"
+	"github.com/dailymuse/gzap"
 )
 
 func main() {
     // Instantiate a global logger.
-    if err := gml.New(&gml.Config{
+    if err := gzap.New(&gzap.Config{
         AppName: "app-name",
         IsProdEnv: true,
         IsStagingEnv: false,
@@ -42,17 +42,17 @@ func main() {
     }
 
     // Example Info log.
-    gml.Logger.Info("this is an example Info log",
-        gml.Error(errors.New("example error")),
-        gml.String("process name", "some-fake-name"),
+    gzap.Logger.Info("this is an example Info log",
+        gzap.Error(errors.New("example error")),
+        gzap.String("process name", "some-fake-name"),
     )
 
     // Example Error log.
-    gml.Logger.Error("this is an example Error log",
-        gml.Int64("docsUploaded", int64(100)),
-        gml.Int64("expectedDocs", int64(255)),
-        gml.String("index name", "my-full-index-name"),
-        gml.Float64("time elapsed", float64(1002)),
+    gzap.Logger.Error("this is an example Error log",
+        gzap.Int64("docsUploaded", int64(100)),
+        gzap.Int64("expectedDocs", int64(255)),
+        gzap.String("index name", "my-full-index-name"),
+        gzap.Float64("time elapsed", float64(1002)),
     )
 }
 ```

@@ -1,4 +1,4 @@
-package gml
+package gzap
 
 import (
 	graylog "github.com/Devatoria/go-graylog"

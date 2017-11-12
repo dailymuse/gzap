@@ -1,4 +1,4 @@
-package gml
+package gzap
 
 import (
 	"go.uber.org/zap"
