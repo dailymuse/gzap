@@ -15,7 +15,7 @@ import "gopkg.in/dailymuse/gzap.v1"
 ### Internal API
 The logger that is publicly exposed is the zap [Logger](https://godoc.org/go.uber.org/zap#Logger). You can reference what log levels are available for use [here](https://godoc.org/go.uber.org/zap#Logger)). Below are a few examples:
 
-```go
+```
 func (log *Logger) DPanic(msg string, fields ...zapcore.Field)
 func (log *Logger) Debug(msg string, fields ...zapcore.Field)
 func (log *Logger) Error(msg string, fields ...zapcore.Field)
@@ -33,7 +33,7 @@ gzap.Logger.Error("this is an example Debug log",
 )
 ```
 
-For any other information please take a look at the gzap (Godoc](https://godoc.org/github.com/dailymuse/gzap).
+For any other information please take a look at the gzap [Godoc](https://godoc.org/github.com/dailymuse/gzap).
 
 ### Example Usage
 
