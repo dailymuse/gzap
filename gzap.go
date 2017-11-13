@@ -14,38 +14,32 @@ var Logger = getLogger()
 // logger is the package level pointer to an instantied Logger.
 var logger *zap.Logger
 
-var envNotSetErrorString = "no env was explicity set, and not currently running tests"
+// logInitializer represents a function that initializes
+type logInitializer func(cfg *Config) error
+
+// envToLogInitializerMapping represents the different type of log initializers
+// to their correlating env level.
+var envToLogInitializerMapping = map[int]logInitializer{
+	testEnv:    setTestLogger,
+	devEnv:     setDevelopmentLogger,
+	stagingEnv: setStagingLogger,
+	prodEnv:    setProductionLogger,
+}
 
 // Init initializes a global Logger based upon the configurations you pass in. If no env is
 // specifically set, or found (in the case of TestEnv), then it will return an error.
 func Init(cfg *Config) error {
-	if cfg.IsProdEnv {
-		if err := setProductionLogger(cfg); err != nil {
-			return err
-		}
-
-		return nil
+	env, err := getGraylogEnv(cfg)
+	if err != nil {
+		return err
 	}
 
-	if cfg.IsStagingEnv {
-		if err := setStagingLogger(cfg); err != nil {
-			return err
-		}
-
-		return nil
+	logInitalizer, ok := envToLogInitializerMapping[env]
+	if !ok {
+		return errors.New(envNotSetErrorString)
 	}
 
-	if cfg.IsDevEnv {
-		setDevelopmentLogger()
-		return nil
-	}
-
-	if cfg.IsTestEnv {
-		setTestLogger()
-		return nil
-	}
-
-	return errors.New(envNotSetErrorString)
+	return logInitalizer(cfg)
 }
 
 // getLogger is an internal function that returns an instantied Logger,
@@ -110,18 +104,25 @@ func setStagingLogger(cfg *Config) error {
 	return nil
 }
 
-func setDevelopmentLogger() {
+func setDevelopmentLogger(cfg *Config) error {
+	if cfg._mockDevErr != nil {
+		return cfg._mockDevErr
+	}
+
 	Config := zap.NewDevelopmentConfig()
 	Config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	zapDevelopmentLogger, err := Config.Build()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	logger = zapDevelopmentLogger
+
+	return nil
 }
 
-func setTestLogger() {
+func setTestLogger(cfg *Config) error {
 	zapNopLogger := zap.NewNop()
 	logger = zapNopLogger
+	return nil
 }
