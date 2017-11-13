@@ -50,18 +50,13 @@ func main() {
     // Instantiate a global logger.
     if err := gzap.Init(&gzap.Config{
         AppName: "app-name",
-        IsProdEnv: true,
-        IsStagingEnv: false,
-        IsTestEnv: false,
-        IsDevEnv: false,
         GraylogAddress: "127.0.0.1",
         GraylogPort: 1234,
         GraylogVersion: "1.1",
-        Hostname: "myhostname",
+        GraylogConnectionTimeout: time.Second * 3,
         UseTLS: true,
         InsecureSkipVerify: true,
         LogEnvName: "prod",
-        GraylogConnectionTimeout: time.Second * 3,
     }); err != nil {
         panic(err)
     }
