@@ -1,6 +1,7 @@
 package gzap
 
 import (
+	"os"
 	"strconv"
 
 	"github.com/Devatoria/go-graylog"
@@ -36,6 +37,11 @@ var zapToSyslog = map[zapcore.Level]uint{
 
 // Write writes messages to the configured Graylog endpoint.
 func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return err
+	}
+
 	extraFields := map[string]string{
 		"File":       entry.Caller.File,
 		"Line":       strconv.Itoa(entry.Caller.Line),
@@ -55,7 +61,7 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 	if err := gc.Graylog.Send(graylog.Message{
 		Version:      gc.cfg.GraylogVersion,
-		Host:         gc.cfg.Hostname,
+		Host:         hostname,
 		ShortMessage: entry.Message,
 		FullMessage:  entry.Stack,
 		Timestamp:    entry.Time.Unix(),
