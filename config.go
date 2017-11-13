@@ -13,7 +13,6 @@ type Config struct {
 	GraylogAddress           string
 	GraylogPort              uint
 	GraylogVersion           string
-	Hostname                 string
 	UseTLS                   bool
 	InsecureSkipVerify       bool
 	LogEnvName               string
@@ -33,7 +32,6 @@ func NewConfig(
 	GraylogAddress string,
 	GraylogPort uint,
 	GraylogVersion string,
-	Hostname string,
 	UseTLS bool,
 	InsecureSkipVerify bool,
 	LogEnvName string,
@@ -48,7 +46,6 @@ func NewConfig(
 		GraylogAddress,
 		GraylogPort,
 		GraylogVersion,
-		Hostname,
 		UseTLS,
 		InsecureSkipVerify,
 		LogEnvName,
