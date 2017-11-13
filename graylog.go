@@ -17,7 +17,7 @@ type Graylog interface {
 // NewGraylog returns a new Graylog instance.
 func NewGraylog(cfg *Config) (Graylog, error) {
 	if cfg._isMock {
-		return cfg._mock, cfg._mockErr
+		return cfg._mockGraylog, cfg._mockGraylogErr
 	}
 
 	if cfg.UseTLS {

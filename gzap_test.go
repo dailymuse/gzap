@@ -20,9 +20,9 @@ func TestInit(t *testing.T) {
 			"Init should fail if Graylog fails to connect with Prod configuration",
 			args{
 				&Config{
-					IsProdEnv: true,
-					_isMock:   true,
-					_mockErr:  errors.New("could not connect to Graylog"),
+					_isMock:         true,
+					_mockEnv:        prodEnv,
+					_mockGraylogErr: errors.New("could not connect to Graylog"),
 				},
 			},
 			true,
@@ -32,10 +32,10 @@ func TestInit(t *testing.T) {
 			"Init should pass if Graylog connects with Prod configuration",
 			args{
 				&Config{
-					IsProdEnv: true,
-					_isMock:   true,
-					_mock:     &MockGraylog{},
-					_mockErr:  nil,
+					_isMock:         true,
+					_mockEnv:        prodEnv,
+					_mockGraylog:    &MockGraylog{},
+					_mockGraylogErr: nil,
 				},
 			},
 			false,
@@ -45,9 +45,9 @@ func TestInit(t *testing.T) {
 			"Init should fail if Graylog fails to connect with Staging configuration",
 			args{
 				&Config{
-					IsStagingEnv: true,
-					_isMock:      true,
-					_mockErr:     errors.New("could not connect to Graylog"),
+					_isMock:         true,
+					_mockEnv:        stagingEnv,
+					_mockGraylogErr: errors.New("could not connect to Graylog"),
 				},
 			},
 			true,
@@ -57,10 +57,10 @@ func TestInit(t *testing.T) {
 			"Init should pass if Graylog connects with Staging configuration",
 			args{
 				&Config{
-					IsStagingEnv: true,
-					_isMock:      true,
-					_mock:        &MockGraylog{},
-					_mockErr:     nil,
+					_isMock:         true,
+					_mockEnv:        stagingEnv,
+					_mockGraylog:    &MockGraylog{},
+					_mockGraylogErr: nil,
 				},
 			},
 			false,
@@ -78,19 +78,46 @@ func TestInit(t *testing.T) {
 			"Init should pass if using dev configuration",
 			args{
 				&Config{
-					IsDevEnv: true,
+					_isMock:  true,
+					_mockEnv: devEnv,
 				},
 			},
 			false,
 			"",
 		},
 		{
-			"Init should fail if no configuration is passed",
+			"Init should fail if invalid configuration is passed",
 			args{
-				&Config{},
+				&Config{
+					_isMock:  true,
+					_mockEnv: 99,
+				},
 			},
 			true,
-			"no env was explicity set, and not currently running tests",
+			"no valid env was explicity set, and not currently running tests",
+		},
+		{
+			"Init should fail if it cannot parse GRAYLOG_ENV",
+			args{
+				&Config{
+					_isMock:       true,
+					_mockEnvError: errors.New("error occured when parsing env"),
+				},
+			},
+			true,
+			"error occured when parsing env",
+		},
+		{
+			"Init should fail if dev logger throws error",
+			args{
+				&Config{
+					_isMock:     true,
+					_mockEnv:    devEnv,
+					_mockDevErr: errors.New("could not build development logger"),
+				},
+			},
+			true,
+			"could not build development logger",
 		},
 	}
 	for _, tt := range tests {
@@ -111,9 +138,6 @@ func TestInit(t *testing.T) {
 func ExampleInit() {
 	if err := Init(&Config{
 		AppName:                  "",
-		IsProdEnv:                false,
-		IsStagingEnv:             false,
-		IsTestEnv:                false,
 		GraylogAddress:           "",
 		GraylogPort:              0,
 		GraylogVersion:           "",
