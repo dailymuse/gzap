@@ -12,6 +12,15 @@ To use gzap, simply import:
 import "gopkg.in/dailymuse/gzap.v1"
 ```
 
+The Graylog logsink is only enabled for Production and Staging environments. So you'll need to set a `GRAYLOG_ENV` environment variable with either of the following correlating states.
+
+GRAYLOG_ENV | Environment  | Graylog enabled?
+--- | --- | ---
+  0 | Test (no-op logger) | ❌
+  1 | Dev | ❌
+  2 | Staging | ✅
+  3 | Production | ✅
+
 ### Internal API
 The logger that is publicly exposed is the zap [Logger](https://godoc.org/go.uber.org/zap#Logger). You can reference what log levels are available for use [here](https://godoc.org/go.uber.org/zap#Logger)). Below are a few examples:
 
@@ -52,7 +61,6 @@ func main() {
         AppName: "app-name",
         GraylogAddress: "127.0.0.1",
         GraylogPort: 1234,
-        GraylogVersion: "1.1",
         GraylogConnectionTimeout: time.Second * 3,
         UseTLS: true,
         InsecureSkipVerify: true,

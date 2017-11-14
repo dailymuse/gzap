@@ -60,7 +60,7 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	}
 
 	if err := gc.Graylog.Send(graylog.Message{
-		Version:      gc.cfg.GraylogVersion,
+		Version:      "1.1",
 		Host:         hostname,
 		ShortMessage: entry.Message,
 		FullMessage:  entry.Stack,

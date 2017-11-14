@@ -140,7 +140,6 @@ func ExampleInit() {
 		AppName:                  "",
 		GraylogAddress:           "",
 		GraylogPort:              0,
-		GraylogVersion:           "",
 		UseTLS:                   false,
 		InsecureSkipVerify:       false,
 		LogEnvName:               "",
