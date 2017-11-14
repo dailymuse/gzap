@@ -26,9 +26,12 @@ var envToLogInitializerMapping = map[int]logInitializer{
 	prodEnv:    setProductionLogger,
 }
 
-// Init initializes a global Logger based upon the configurations you pass in. If no env is
-// specifically set, or found (in the case of TestEnv), then it will return an error.
-func Init(cfg *Config) error {
+// InitLogger initializes a global Logger based upon your env configurations.
+func InitLogger() error {
+	return initLogger(&Config{})
+}
+
+func initLogger(cfg *Config) error {
 	env, err := cfg.getGraylogEnv()
 	if err != nil {
 		return err
@@ -50,7 +53,7 @@ func Init(cfg *Config) error {
 // use a no-op logger, to reduce test noise.
 func getLogger() *zap.Logger {
 	if logger == nil {
-		Init(NewDefaultTestConfig())
+		InitLogger()
 	}
 
 	return logger

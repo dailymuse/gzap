@@ -32,26 +32,6 @@ type Config struct {
 	_mockDevErr     error
 }
 
-// NewDefaultTestConfig returns a noop logging Config used for run testing.
-func NewDefaultTestConfig() *Config {
-	return &Config{}
-}
-
-// NewConfig returns a new logging Config with the supplied arugments.
-func NewConfig(
-	InsecureSkipVerify bool,
-) *Config {
-	return &Config{
-		nil,
-		false,
-		0,
-		nil,
-		nil,
-		nil,
-		nil,
-	}
-}
-
 func (c *Config) getGraylogAppName() string {
 	if c._isMock {
 		return ""

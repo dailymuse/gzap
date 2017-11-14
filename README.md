@@ -2,24 +2,35 @@
 
 [![GoDoc](https://godoc.org/github.com/dailymuse/gzap?status.svg)](https://godoc.org/github.com/dailymuse/gzap) [![CircleCI](https://circleci.com/gh/dailymuse/gzap.svg?style=svg)](https://circleci.com/gh/dailymuse/gzap) [![codecov](https://codecov.io/gh/dailymuse/gzap/branch/master/graph/badge.svg)](https://codecov.io/gh/dailymuse/gzap)
 
-Gzap provide fast structured leveled logging using [zap](https://github.com/uber-go/zap), and a TCP Graylog logsink (TLS supported). Both [zap](https://github.com/uber-go/zap) and [Graylog](https://github.com/Devatoria/go-graylog) librarys are versioned locked within the applications so no other external dependencies required. 
+Gzap provide fast structured leveled logging using [zap](https://github.com/uber-go/zap), and a TCP/UDP Graylog logsink (TLS supported). Both [zap](https://github.com/uber-go/zap) and [Graylog](https://github.com/Devatoria/go-graylog) librarys are versioned locked within the applications so no other external dependencies required. 
 
 ### Getting Stated
 
-To use gzap, simply import:
+To use gzap, first import it:
 
 ```go
 import "gopkg.in/dailymuse/gzap.v1"
 ```
 
-The Graylog logsink is only enabled for Production and Staging environments. So you'll need to set a `GRAYLOG_ENV` environment variable with either of the following correlating states.
+> The Graylog logsink is only enabled for Production and Staging environments. So you'll need to set a `GRAYLOG_ENV` environment variable with either of the following correlating states.
 
 GRAYLOG_ENV | Environment  | Graylog enabled?
 --- | --- | ---
-  0 | Test (no-op logger) | ❌
-  1 | Dev | ❌
-  2 | Staging | ✅
-  3 | Production | ✅
+0 | Test (no-op logger) | ❌
+1 | Dev | ❌
+2 | Staging | ✅
+3 | Production | ✅
+
+
+### Environment Variables
+
+To properly use `gzap` you'll need to set your configurations via Environment variables. The following are configurable Envs:
+
+Env Name | Description
+--- | --- |
+GRAYLOG_ENV | A number 0 - 3 describing the Graylog loggin environment you wish to use (Refrence table above)
+GRAYLOG_HOST | Hostname that your graylog is currently listening on `example.graylog.com`
+
 
 ### Internal API
 The logger that is publicly exposed is the zap [Logger](https://godoc.org/go.uber.org/zap#Logger). You can reference what log levels are available for use [here](https://godoc.org/go.uber.org/zap#Logger)). Below are a few examples:
@@ -37,7 +48,7 @@ func (log *Logger) Warn(msg string, fields ...zapcore.Field)
 All zap [fields](https://godoc.org/go.uber.org/zap/zapcore#Field) needed for logging are also exposed by gzap.
 
 ```go
-gzap.Logger.Error("this is an example Debug log",
+gzap.Logger.Error("this is an example Error log",
         gzap.String("variable", "some-variable-here"),
 )
 ```
@@ -57,14 +68,7 @@ import (
 
 func main() {
     // Instantiate a global logger.
-    if err := gzap.Init(&gzap.Config{
-        GraylogAddress: "127.0.0.1",
-        GraylogPort: 1234,
-        GraylogConnectionTimeout: time.Second * 3,
-        UseTLS: true,
-        InsecureSkipVerify: true,
-        LogEnvName: "prod",
-    }); err != nil {
+    if err := gzap.InitLogger(); err != nil {
         panic(err)
     }
 
@@ -83,7 +87,7 @@ func main() {
     )
 
     // Example Debug log.
-    gzap.Logger.Error("this is an example Debug log",
+    gzap.Logger.Debug("this is an example Debug log",
         gzap.String("variable", "some-variable-here"),
     )
 }
@@ -99,12 +103,4 @@ In order to contribute you'll need to have a valid go environment setup.
 
 ##### Tests Logs are a no-op
 
-Tests that run application code containing logs will not print those logs by default. The Test logger is a no-op to reduce noise during testing. If you wish to see logs you will need to initialize the logger in the test suite itself with the `IsDevEnv` as `true`.
-
-```go
-    if err := gzap.Init(&gzap.Config{
-        IsDevEnv: true,
-    }); err != nil {
-        panic(err)
-    }
-```
+Tests that run application code containing logs will not print those logs by default. The Test logger is a no-op to reduce noise during testing.
