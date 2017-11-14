@@ -29,7 +29,7 @@ var envToLogInitializerMapping = map[int]logInitializer{
 // Init initializes a global Logger based upon the configurations you pass in. If no env is
 // specifically set, or found (in the case of TestEnv), then it will return an error.
 func Init(cfg *Config) error {
-	env, err := getGraylogEnv(cfg)
+	env, err := cfg.getGraylogEnv()
 	if err != nil {
 		return err
 	}

@@ -14,11 +14,11 @@ const stagingEnv = 2
 const prodEnv = 3
 
 var envNotSetErrorString = "no valid env was explicity set, and not currently running tests"
+var hostname = "LOL"
 
 // Config represents all the logger configurations available
 // when instaniating a new Logger.
 type Config struct {
-	AppName                  string
 	GraylogAddress           string
 	GraylogPort              uint
 	UseTLS                   bool
@@ -33,13 +33,13 @@ type Config struct {
 	_mockDevErr              error
 }
 
+// NewDefaultTestConfig returns a noop logging Config used for run testing.
+func NewDefaultTestConfig() *Config {
+	return &Config{}
+}
+
 // NewConfig returns a new logging Config with the supplied arugments.
 func NewConfig(
-	AppName string,
-	IsProdEnv bool,
-	IsStagingEnv bool,
-	IsTestEnv bool,
-	IsDevEnv bool,
 	GraylogAddress string,
 	GraylogPort uint,
 	UseTLS bool,
@@ -48,7 +48,6 @@ func NewConfig(
 	GraylogConnectionTimeout time.Duration,
 ) *Config {
 	return &Config{
-		AppName,
 		GraylogAddress,
 		GraylogPort,
 		UseTLS,
@@ -64,14 +63,22 @@ func NewConfig(
 	}
 }
 
-// NewDefaultTestConfig returns a noop logging Config used for run testing.
-func NewDefaultTestConfig() *Config {
-	return &Config{}
+func (c Config) getGraylogAppName() string {
+	if c._isMock {
+		return ""
+	}
+
+	appName := os.Getenv("GRAYLOG_APP_NAME")
+	if appName == "" {
+		panic("GRAYLOG_APP_NAME not set")
+	}
+
+	return appName
 }
 
-func getGraylogEnv(cfg *Config) (int, error) {
-	if cfg._isMock {
-		return cfg._mockEnv, cfg._mockEnvError
+func (c Config) getGraylogEnv() (int, error) {
+	if c._isMock {
+		return c._mockEnv, c._mockEnvError
 	}
 
 	// If we're running test return test logger env.

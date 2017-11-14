@@ -46,7 +46,7 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		"File":       entry.Caller.File,
 		"Line":       strconv.Itoa(entry.Caller.Line),
 		"LoggerName": entry.LoggerName,
-		"AppName":    gc.cfg.AppName,
+		"AppName":    gc.cfg.getGraylogAppName(),
 	}
 
 	// the order here is important,

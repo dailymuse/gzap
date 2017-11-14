@@ -137,7 +137,6 @@ func TestInit(t *testing.T) {
 
 func ExampleInit() {
 	if err := Init(&Config{
-		AppName:                  "",
 		GraylogAddress:           "",
 		GraylogPort:              0,
 		UseTLS:                   false,

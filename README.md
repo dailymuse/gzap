@@ -58,7 +58,6 @@ import (
 func main() {
     // Instantiate a global logger.
     if err := gzap.Init(&gzap.Config{
-        AppName: "app-name",
         GraylogAddress: "127.0.0.1",
         GraylogPort: 1234,
         GraylogConnectionTimeout: time.Second * 3,
@@ -102,9 +101,8 @@ In order to contribute you'll need to have a valid go environment setup.
 
 Tests that run application code containing logs will not print those logs by default. The Test logger is a no-op to reduce noise during testing. If you wish to see logs you will need to initialize the logger in the test suite itself with the `IsDevEnv` as `true`.
 
-
 ```go
-if err := gzap.Init(&gzap.Config{
+    if err := gzap.Init(&gzap.Config{
         IsDevEnv: true,
     }); err != nil {
         panic(err)
