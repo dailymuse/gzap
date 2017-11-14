@@ -20,23 +20,30 @@ func NewGraylog(cfg *Config) (Graylog, error) {
 		return cfg._mockGraylog, cfg._mockGraylogErr
 	}
 
-	if cfg.UseTLS {
-		return getGraylogTLS(cfg)
+	var gl Graylog
+	var err error
+
+	if cfg.getGraylogHandlerType() == graylog.UDP {
+		gl, err = getGraylogUDP(cfg)
 	}
 
-	return getGraylog(cfg)
+	if cfg.getGraylogHandlerType() == tlsTransport {
+		gl, err = getGraylogTLS(cfg)
+	}
+
+	return gl, err
 }
 
 func getGraylogTLS(cfg *Config) (Graylog, error) {
 	g, err := graylog.NewGraylogTLS(
 		graylog.Endpoint{
 			Transport: graylog.TCP,
-			Address:   cfg.GraylogAddress,
-			Port:      cfg.GraylogPort,
+			Address:   cfg.getGraylogHost(),
+			Port:      cfg.getGraylogPort(),
 		},
-		cfg.GraylogConnectionTimeout,
+		cfg.getGraylogTLSTimeout(),
 		&tls.Config{
-			InsecureSkipVerify: cfg.InsecureSkipVerify,
+			InsecureSkipVerify: cfg.getGraylogSkipInsecureSkipVerify(),
 		},
 	)
 
@@ -47,12 +54,12 @@ func getGraylogTLS(cfg *Config) (Graylog, error) {
 	return g, nil
 }
 
-func getGraylog(cfg *Config) (Graylog, error) {
+func getGraylogUDP(cfg *Config) (Graylog, error) {
 	g, err := graylog.NewGraylog(
 		graylog.Endpoint{
-			Transport: graylog.TCP,
-			Address:   cfg.GraylogAddress,
-			Port:      cfg.GraylogPort,
+			Transport: graylog.UDP,
+			Address:   cfg.getGraylogHost(),
+			Port:      cfg.getGraylogPort(),
 		},
 	)
 

@@ -31,7 +31,9 @@ func TestGelfCore_Write(t *testing.T) {
 			fields{
 				&MockGraylog{},
 				[]zapcore.Field{},
-				&Config{},
+				&Config{
+					_isMock: true,
+				},
 			},
 			args{
 				zapcore.Entry{},
@@ -46,7 +48,9 @@ func TestGelfCore_Write(t *testing.T) {
 			fields{
 				&MockGraylog{},
 				[]zapcore.Field{},
-				&Config{},
+				&Config{
+					_isMock: true,
+				},
 			},
 			args{
 				zapcore.Entry{},
