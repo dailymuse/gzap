@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	graylog "github.com/Devatoria/go-graylog"
 )
 
 const testEnv = 0
@@ -70,7 +72,7 @@ func (c Config) getGraylogAppName() string {
 
 	appName := os.Getenv("GRAYLOG_APP_NAME")
 	if appName == "" {
-		panic("GRAYLOG_APP_NAME not set")
+		panic("GRAYLOG_APP_NAME env not set")
 	}
 
 	return appName
@@ -97,4 +99,22 @@ func (c Config) getGraylogEnv() (int, error) {
 	}
 
 	return envLevel, nil
+}
+
+func (c Config) getGraylogHandlerType() graylog.Transport {
+	handlerType := os.Getenv("GRAYLOG_HANDLER_TYPE")
+	if handlerType == "" {
+		panic("GRAYLOG_HANDLER_TYPE env not set")
+	}
+
+	var transportType graylog.Transport
+	if graylog.Transport(handlerType) == graylog.TCP {
+		transportType = graylog.TCP
+	}
+
+	if graylog.Transport(handlerType) == graylog.UDP {
+		transportType = graylog.UDP
+	}
+
+	return transportType
 }

@@ -30,7 +30,7 @@ func NewGraylog(cfg *Config) (Graylog, error) {
 func getGraylogTLS(cfg *Config) (Graylog, error) {
 	g, err := graylog.NewGraylogTLS(
 		graylog.Endpoint{
-			Transport: graylog.TCP,
+			Transport: cfg.getGraylogHandlerType(),
 			Address:   cfg.GraylogAddress,
 			Port:      cfg.GraylogPort,
 		},
@@ -50,7 +50,7 @@ func getGraylogTLS(cfg *Config) (Graylog, error) {
 func getGraylog(cfg *Config) (Graylog, error) {
 	g, err := graylog.NewGraylog(
 		graylog.Endpoint{
-			Transport: graylog.TCP,
+			Transport: cfg.getGraylogHandlerType(),
 			Address:   cfg.GraylogAddress,
 			Port:      cfg.GraylogPort,
 		},
