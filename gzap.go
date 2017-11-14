@@ -69,7 +69,7 @@ func setProductionLogger(cfg *Config) error {
 		zap.Fields(
 			zapcore.Field{
 				Key:    "Env",
-				String: cfg.LogEnvName,
+				String: cfg.getGraylogLogEnvName(),
 				Type:   zapcore.StringType,
 			},
 		),
@@ -93,7 +93,7 @@ func setStagingLogger(cfg *Config) error {
 		zap.Fields(
 			zapcore.Field{
 				Key:    "Env",
-				String: cfg.LogEnvName,
+				String: cfg.getGraylogLogEnvName(),
 				Type:   zapcore.StringType,
 			},
 		),
