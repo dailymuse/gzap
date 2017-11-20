@@ -2,7 +2,6 @@ package gzap
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	"go.uber.org/zap"
@@ -25,7 +24,7 @@ var lowPriority = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 })
 
 // logInitializer represents a function that initializes
-type logInitializer func(cfg *Config) error
+type logInitializer func(cfg Config) error
 
 // envToLogInitializerMapping represents the different type of log initializers
 // to their correlating env level.
@@ -38,22 +37,19 @@ var envToLogInitializerMapping = map[int]logInitializer{
 
 // InitLogger initializes a global Logger based upon your env configurations.
 func InitLogger() error {
-	return initLogger(&Config{})
+	return initLogger(Config{})
 }
 
-func initLogger(cfg *Config) error {
+func initLogger(cfg Config) error {
 	env, err := cfg.getGraylogEnv()
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("ENV: ", env)
 	logInitalizer, ok := envToLogInitializerMapping[env]
 	if !ok {
 		return errors.New(envNotSetErrorString)
 	}
-
-	fmt.Println("LOL")
 
 	return logInitalizer(cfg)
 }
@@ -65,7 +61,6 @@ func initLogger(cfg *Config) error {
 // need an instaniated Logger to run. In this case we want to make sure we
 // use a no-op logger, to reduce test noise.
 func getLogger() *zap.Logger {
-	fmt.Println("LOGGER: ", logger)
 	if logger == nil {
 		InitLogger()
 	}
@@ -73,7 +68,7 @@ func getLogger() *zap.Logger {
 	return logger
 }
 
-func setProductionLogger(cfg *Config) error {
+func setProductionLogger(cfg Config) error {
 	graylog, err := NewGraylog(cfg)
 	if err != nil {
 		return err
@@ -113,7 +108,7 @@ func setProductionLogger(cfg *Config) error {
 	return nil
 }
 
-func setStagingLogger(cfg *Config) error {
+func setStagingLogger(cfg Config) error {
 	graylog, err := NewGraylog(cfg)
 	if err != nil {
 		return err
@@ -153,7 +148,7 @@ func setStagingLogger(cfg *Config) error {
 	return nil
 }
 
-func setDevelopmentLogger(cfg *Config) error {
+func setDevelopmentLogger(cfg Config) error {
 	if cfg._mockDevErr != nil {
 		return cfg._mockDevErr
 	}
@@ -170,7 +165,7 @@ func setDevelopmentLogger(cfg *Config) error {
 	return nil
 }
 
-func setTestLogger(cfg *Config) error {
+func setTestLogger(cfg Config) error {
 	zapNopLogger := zap.NewNop()
 	logger = zapNopLogger
 	return nil

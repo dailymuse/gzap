@@ -32,7 +32,7 @@ type Config struct {
 	_mockDevErr     error
 }
 
-func (c *Config) getGraylogAppName() string {
+func (c Config) getGraylogAppName() string {
 	if c._isMock {
 		return ""
 	}
@@ -45,7 +45,7 @@ func (c *Config) getGraylogAppName() string {
 	return appName
 }
 
-func (c *Config) getGraylogEnv() (int, error) {
+func (c Config) getGraylogEnv() (int, error) {
 	if c._isMock {
 		return c._mockEnv, c._mockEnvError
 	}
@@ -68,7 +68,7 @@ func (c *Config) getGraylogEnv() (int, error) {
 	return envLevel, nil
 }
 
-func (c *Config) getGraylogHandlerType() graylog.Transport {
+func (c Config) getGraylogHandlerType() graylog.Transport {
 	handlerType := os.Getenv("GRAYLOG_HANDLER_TYPE")
 	if handlerType == "" {
 		panic("GRAYLOG_HANDLER_TYPE env not set")
@@ -86,7 +86,7 @@ func (c *Config) getGraylogHandlerType() graylog.Transport {
 	return transportType
 }
 
-func (c *Config) getGraylogHost() string {
+func (c Config) getGraylogHost() string {
 	graylogHost := os.Getenv("GRAYLOG_HOST")
 	if graylogHost == "" {
 		panic("GRAYLOG_HOST env not set")
@@ -95,7 +95,7 @@ func (c *Config) getGraylogHost() string {
 	return graylogHost
 }
 
-func (c *Config) useTLS() bool {
+func (c Config) useTLS() bool {
 	handlerType := os.Getenv("GRAYLOG_HANDLER_TYPE")
 	if handlerType == "" {
 		panic("GRAYLOG_HANDLER_TYPE env not set")
@@ -108,7 +108,7 @@ func (c *Config) useTLS() bool {
 	return false
 }
 
-func (c *Config) getGraylogPort() uint {
+func (c Config) getGraylogPort() uint {
 	var portString string
 	if c.getGraylogHandlerType() == graylog.UDP {
 		portString = os.Getenv("GRAYLOG_UDP_PORT")
@@ -130,7 +130,7 @@ func (c *Config) getGraylogPort() uint {
 	return uint(port)
 }
 
-func (c *Config) getGraylogTLSTimeout() time.Duration {
+func (c Config) getGraylogTLSTimeout() time.Duration {
 	defaultTimeout := time.Second * 3
 
 	timeoutString := os.Getenv("GRAYLOG_TLS_TIMEOUT_SECS")
@@ -146,7 +146,7 @@ func (c *Config) getGraylogTLSTimeout() time.Duration {
 	return time.Second * time.Duration(timeoutSeconds)
 }
 
-func (c *Config) getGraylogLogEnvName() string {
+func (c Config) getGraylogLogEnvName() string {
 	// Check if we already memoized the log env name.
 	if c.logEnvName != nil {
 		return *c.logEnvName
@@ -172,7 +172,7 @@ func (c *Config) getGraylogLogEnvName() string {
 	return logEnvName
 }
 
-func (c *Config) getGraylogSkipInsecureSkipVerify() bool {
+func (c Config) getGraylogSkipInsecureSkipVerify() bool {
 	skipInsecure := os.Getenv("GRAYLOG_SKIP_TLS_VERIFY")
 	if skipInsecure == "true" {
 		return true
