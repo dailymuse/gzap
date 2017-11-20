@@ -114,7 +114,7 @@ func (c *Config) getGraylogPort() uint {
 		portString = os.Getenv("GRAYLOG_UDP_PORT")
 	}
 
-	if c.getGraylogHandlerType() == tlsTransport {
+	if c.getGraylogHandlerType() == graylog.TCP {
 		portString = os.Getenv("GRAYLOG_TLS_PORT")
 	}
 

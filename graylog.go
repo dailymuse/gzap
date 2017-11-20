@@ -27,7 +27,7 @@ func NewGraylog(cfg *Config) (Graylog, error) {
 		gl, err = getGraylogUDP(cfg)
 	}
 
-	if cfg.getGraylogHandlerType() == tlsTransport {
+	if cfg.getGraylogHandlerType() == graylog.TCP {
 		gl, err = getGraylogTLS(cfg)
 	}
 
