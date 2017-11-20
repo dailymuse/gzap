@@ -43,10 +43,10 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	}
 
 	extraFields := map[string]string{
-		"File":       entry.Caller.File,
-		"Line":       strconv.Itoa(entry.Caller.Line),
-		"LoggerName": entry.LoggerName,
-		"AppName":    gc.cfg.getGraylogAppName(),
+		"file":        entry.Caller.File,
+		"line":        strconv.Itoa(entry.Caller.Line),
+		"logger_name": entry.LoggerName,
+		"app_name":    gc.cfg.getGraylogAppName(),
 	}
 
 	// the order here is important,

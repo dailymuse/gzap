@@ -2,6 +2,7 @@ package gzap
 
 import (
 	"errors"
+	"os"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -13,6 +14,14 @@ var Logger = getLogger()
 
 // logger is the package level pointer to an instantied Logger.
 var logger *zap.Logger
+
+var highPriority = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+	return lvl >= zapcore.ErrorLevel
+})
+
+var lowPriority = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+	return lvl < zapcore.ErrorLevel
+})
 
 // logInitializer represents a function that initializes
 type logInitializer func(cfg *Config) error
@@ -65,13 +74,29 @@ func setProductionLogger(cfg *Config) error {
 		return err
 	}
 
+	consoleDebugging := zapcore.Lock(os.Stdout)
+	consoleErrors := zapcore.Lock(os.Stderr)
+	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+
 	zapProductionLogger := zap.New(
-		NewGelfCore(cfg, graylog),
+		zapcore.NewTee(
+			NewGelfCore(cfg, graylog),
+			zapcore.NewCore(
+				consoleEncoder,
+				consoleDebugging,
+				lowPriority,
+			),
+			zapcore.NewCore(
+				consoleEncoder,
+				consoleErrors,
+				highPriority,
+			),
+		),
 		zap.AddCaller(),
 		zap.AddStacktrace(zapcore.ErrorLevel),
 		zap.Fields(
 			zapcore.Field{
-				Key:    "Env",
+				Key:    "env",
 				String: cfg.getGraylogLogEnvName(),
 				Type:   zapcore.StringType,
 			},
@@ -89,20 +114,36 @@ func setStagingLogger(cfg *Config) error {
 		return err
 	}
 
-	zapProductionLogger := zap.New(
-		NewGelfCore(cfg, graylog),
+	consoleDebugging := zapcore.Lock(os.Stdout)
+	consoleErrors := zapcore.Lock(os.Stderr)
+	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+
+	zapStagingLogger := zap.New(
+		zapcore.NewTee(
+			NewGelfCore(cfg, graylog),
+			zapcore.NewCore(
+				consoleEncoder,
+				consoleDebugging,
+				lowPriority,
+			),
+			zapcore.NewCore(
+				consoleEncoder,
+				consoleErrors,
+				highPriority,
+			),
+		),
 		zap.AddCaller(),
 		zap.AddStacktrace(zapcore.ErrorLevel),
 		zap.Fields(
 			zapcore.Field{
-				Key:    "Env",
+				Key:    "env",
 				String: cfg.getGraylogLogEnvName(),
 				Type:   zapcore.StringType,
 			},
 		),
 	)
 
-	logger = zapProductionLogger
+	logger = zapStagingLogger
 
 	return nil
 }
