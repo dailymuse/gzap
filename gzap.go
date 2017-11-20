@@ -2,6 +2,7 @@ package gzap
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"go.uber.org/zap"
@@ -46,10 +47,13 @@ func initLogger(cfg *Config) error {
 		return err
 	}
 
+	fmt.Println("ENV: ", env)
 	logInitalizer, ok := envToLogInitializerMapping[env]
 	if !ok {
 		return errors.New(envNotSetErrorString)
 	}
+
+	fmt.Println("LOL")
 
 	return logInitalizer(cfg)
 }
@@ -61,6 +65,7 @@ func initLogger(cfg *Config) error {
 // need an instaniated Logger to run. In this case we want to make sure we
 // use a no-op logger, to reduce test noise.
 func getLogger() *zap.Logger {
+	fmt.Println("LOGGER: ", logger)
 	if logger == nil {
 		InitLogger()
 	}
