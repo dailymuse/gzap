@@ -7,7 +7,7 @@ import (
 
 func TestInitLogger(t *testing.T) {
 	type args struct {
-		cfg *Config
+		cfg Config
 	}
 	tests := []struct {
 		name    string
@@ -18,7 +18,7 @@ func TestInitLogger(t *testing.T) {
 		{
 			"Init should fail if Graylog fails to connect with Prod configuration",
 			args{
-				&Config{
+				Config{
 					_isMock:         true,
 					_mockEnv:        prodEnv,
 					_mockGraylogErr: errors.New("could not connect to Graylog"),
@@ -30,7 +30,7 @@ func TestInitLogger(t *testing.T) {
 		{
 			"initLogger should pass if Graylog connects with Prod configuration",
 			args{
-				&Config{
+				Config{
 					_isMock:         true,
 					_mockEnv:        prodEnv,
 					_mockGraylog:    &MockGraylog{},
@@ -43,7 +43,7 @@ func TestInitLogger(t *testing.T) {
 		{
 			"initLogger should fail if Graylog fails to connect with Staging configuration",
 			args{
-				&Config{
+				Config{
 					_isMock:         true,
 					_mockEnv:        stagingEnv,
 					_mockGraylogErr: errors.New("could not connect to Graylog"),
@@ -55,7 +55,7 @@ func TestInitLogger(t *testing.T) {
 		{
 			"initLogger should pass if Graylog connects with Staging configuration",
 			args{
-				&Config{
+				Config{
 					_isMock:         true,
 					_mockEnv:        stagingEnv,
 					_mockGraylog:    &MockGraylog{},
@@ -68,7 +68,7 @@ func TestInitLogger(t *testing.T) {
 		{
 			"initLogger should pass if using test configuration",
 			args{
-				&Config{
+				Config{
 					_isMock:  true,
 					_mockEnv: testEnv,
 				},
@@ -79,7 +79,7 @@ func TestInitLogger(t *testing.T) {
 		{
 			"initLogger should pass if using dev configuration",
 			args{
-				&Config{
+				Config{
 					_isMock:  true,
 					_mockEnv: devEnv,
 				},
@@ -90,7 +90,7 @@ func TestInitLogger(t *testing.T) {
 		{
 			"initLogger should fail if invalid configuration is passed",
 			args{
-				&Config{
+				Config{
 					_isMock:  true,
 					_mockEnv: 99,
 				},
@@ -101,7 +101,7 @@ func TestInitLogger(t *testing.T) {
 		{
 			"initLogger should fail if it cannot parse GRAYLOG_ENV",
 			args{
-				&Config{
+				Config{
 					_isMock:       true,
 					_mockEnvError: errors.New("error occured when parsing env"),
 				},
@@ -112,7 +112,7 @@ func TestInitLogger(t *testing.T) {
 		{
 			"initLogger should fail if dev logger throws error",
 			args{
-				&Config{
+				Config{
 					_isMock:     true,
 					_mockEnv:    devEnv,
 					_mockDevErr: errors.New("could not build development logger"),
