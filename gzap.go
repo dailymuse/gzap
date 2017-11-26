@@ -2,6 +2,7 @@ package gzap
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"go.uber.org/zap"
@@ -62,7 +63,9 @@ func initLogger(cfg Config) error {
 // use a no-op logger, to reduce test noise.
 func getLogger() *zap.Logger {
 	if logger == nil {
-		InitLogger()
+		if err := InitLogger(); err != nil {
+			panic(fmt.Sprintf("Could not initialize logger: %v", err))
+		}
 	}
 
 	return logger
