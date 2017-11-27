@@ -44,6 +44,7 @@ func TestInitLogger(t *testing.T) {
 			cfg.On("getGraylogHost").Return(tt.args.graylogHost)
 			cfg.On("getGraylogHandlerType").Return(tt.args.graylogHandlerType)
 			cfg.On("getGraylogLogEnvName").Return(tt.args.graylogLogEnvName)
+			cfg.On("useColoredConsolelogs").Return(true)
 
 			err := initLogger(&cfg)
 

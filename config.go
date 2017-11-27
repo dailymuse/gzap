@@ -24,6 +24,7 @@ type Config interface {
 	getGraylogLogEnvName() string
 	getGraylogSkipInsecureSkipVerify() bool
 	getIsTestEnv() bool
+	useColoredConsolelogs() bool
 }
 
 // EnvConfig represents all the logger configurations available
@@ -143,6 +144,15 @@ func (e *EnvConfig) getGraylogSkipInsecureSkipVerify() bool {
 func (e *EnvConfig) getIsTestEnv() bool {
 	// If we're running test return test logger env.
 	if flag.Lookup("test.v") != nil {
+		return true
+	}
+
+	return false
+}
+
+func (e *EnvConfig) useColoredConsolelogs() bool {
+	envLevel := os.Getenv("THEMUSE_ENV_LEVEL")
+	if envLevel == "1" {
 		return true
 	}
 

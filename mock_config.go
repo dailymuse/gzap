@@ -57,3 +57,8 @@ func (m *MockEnvConfig) getIsTestEnv() bool {
 	args := m.Called()
 	return args.Bool(0)
 }
+
+func (m *MockEnvConfig) useColoredConsolelogs() bool {
+	args := m.Called()
+	return args.Bool(0)
+}
