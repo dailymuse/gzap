@@ -41,6 +41,7 @@ func (e EnvConfig) getGraylogAppName() string {
 }
 
 func (e *EnvConfig) getGraylogHandlerType() graylog.Transport {
+	defaultHandlerType := tlsTransport
 	handlerType := os.Getenv("GRAYLOG_HANDLER_TYPE")
 	if handlerType == "" {
 		panic("GRAYLOG_HANDLER_TYPE env not set")
@@ -55,13 +56,9 @@ func (e *EnvConfig) getGraylogHandlerType() graylog.Transport {
 		transportType = graylog.UDP
 	}
 
+	// If no transport type is set use tls by default.
 	if transportType == "" {
-		panic(
-			fmt.Errorf(
-				"no valid GRAYLOG_HANDLER_TYPE set \"%s\"; expected \"tls\" or \"udp\"",
-				handlerType,
-			),
-		)
+		transportType = graylog.Transport(defaultHandlerType)
 	}
 
 	return transportType
