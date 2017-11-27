@@ -83,6 +83,15 @@ func (c Config) getGraylogHandlerType() graylog.Transport {
 		transportType = graylog.UDP
 	}
 
+	if transportType == "" {
+		panic(
+			fmt.Errorf(
+				"no valid GRAYLOG_HANDLER_TYPE set \"%s\"; expected \"tls\" or \"udp\"",
+				handlerType,
+			),
+		)
+	}
+
 	return transportType
 }
 
