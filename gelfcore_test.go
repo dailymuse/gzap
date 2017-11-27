@@ -4,6 +4,8 @@ import (
 	"errors"
 	"testing"
 
+	"go.uber.org/zap"
+
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/zap/zapcore"
 )
@@ -12,7 +14,7 @@ func TestGelfCore_Write(t *testing.T) {
 	type fields struct {
 		Graylog Graylog
 		Context []zapcore.Field
-		cfg     *Config
+		cfg     Config
 	}
 	type args struct {
 		entry  zapcore.Entry
@@ -31,7 +33,7 @@ func TestGelfCore_Write(t *testing.T) {
 			fields{
 				&MockGraylog{},
 				[]zapcore.Field{},
-				&Config{
+				Config{
 					_isMock: true,
 				},
 			},
@@ -48,7 +50,7 @@ func TestGelfCore_Write(t *testing.T) {
 			fields{
 				&MockGraylog{},
 				[]zapcore.Field{},
-				&Config{
+				Config{
 					_isMock: true,
 				},
 			},
@@ -71,6 +73,7 @@ func TestGelfCore_Write(t *testing.T) {
 				Graylog: tt.fields.Graylog,
 				Context: tt.fields.Context,
 				cfg:     tt.fields.cfg,
+				encoder: zapcore.NewJSONEncoder(zap.NewDevelopmentEncoderConfig()),
 			}
 
 			err := gc.Write(tt.args.entry, tt.args.fields)

@@ -1,6 +1,8 @@
 package gzap
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -13,14 +15,25 @@ import (
 type GelfCore struct {
 	Graylog Graylog
 	Context []zapcore.Field
-	cfg     *Config
+	cfg     Config
+	encoder zapcore.Encoder
 }
 
 // NewGelfCore creates a new GelfCore with empty context.
-func NewGelfCore(cfg *Config, gl Graylog) GelfCore {
+func NewGelfCore(cfg Config, gl Graylog) GelfCore {
+	encoderConfigs := zapcore.EncoderConfig{
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalLevelEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeDuration: zapcore.StringDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+	encoder := zapcore.NewJSONEncoder(encoderConfigs)
+
 	return GelfCore{
 		Graylog: gl,
 		cfg:     cfg,
+		encoder: encoder,
 	}
 }
 
@@ -43,10 +56,10 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	}
 
 	extraFields := map[string]string{
-		"File":       entry.Caller.File,
-		"Line":       strconv.Itoa(entry.Caller.Line),
-		"LoggerName": entry.LoggerName,
-		"AppName":    gc.cfg.getGraylogAppName(),
+		"file":        entry.Caller.File,
+		"line":        strconv.Itoa(entry.Caller.Line),
+		"logger_name": entry.LoggerName,
+		"app_name":    gc.cfg.getGraylogAppName(),
 	}
 
 	// the order here is important,
@@ -57,6 +70,23 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 	for _, field := range fields {
 		extraFields[field.Key] = field.String
+	}
+
+	// Encode the zap fields from fields to JSON with proper types.
+	buf, err := gc.encoder.EncodeEntry(entry, fields)
+	if err != nil {
+		panic(err)
+	}
+
+	// Unmarshal the JSON into a map.
+	m := make(map[string]interface{})
+	if err = json.Unmarshal(buf.Bytes(), &m); err != nil {
+		return err
+	}
+
+	// Parse the map and return only strings.
+	for k, v := range m {
+		extraFields[k] = fmt.Sprintf("%v", v)
 	}
 
 	if err := gc.Graylog.Send(graylog.Message{
@@ -79,6 +109,7 @@ func (gc GelfCore) With(fields []zapcore.Field) zapcore.Core {
 	return GelfCore{
 		Graylog: gc.Graylog,
 		Context: append(gc.Context, fields...),
+		encoder: gc.encoder,
 	}
 }
 

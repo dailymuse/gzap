@@ -15,7 +15,7 @@ type Graylog interface {
 }
 
 // NewGraylog returns a new Graylog instance.
-func NewGraylog(cfg *Config) (Graylog, error) {
+func NewGraylog(cfg Config) (Graylog, error) {
 	if cfg._isMock {
 		return cfg._mockGraylog, cfg._mockGraylogErr
 	}
@@ -27,14 +27,14 @@ func NewGraylog(cfg *Config) (Graylog, error) {
 		gl, err = getGraylogUDP(cfg)
 	}
 
-	if cfg.getGraylogHandlerType() == tlsTransport {
+	if cfg.getGraylogHandlerType() == graylog.TCP {
 		gl, err = getGraylogTLS(cfg)
 	}
 
 	return gl, err
 }
 
-func getGraylogTLS(cfg *Config) (Graylog, error) {
+func getGraylogTLS(cfg Config) (Graylog, error) {
 	g, err := graylog.NewGraylogTLS(
 		graylog.Endpoint{
 			Transport: graylog.TCP,
@@ -54,7 +54,7 @@ func getGraylogTLS(cfg *Config) (Graylog, error) {
 	return g, nil
 }
 
-func getGraylogUDP(cfg *Config) (Graylog, error) {
+func getGraylogUDP(cfg Config) (Graylog, error) {
 	g, err := graylog.NewGraylog(
 		graylog.Endpoint{
 			Transport: graylog.UDP,

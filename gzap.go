@@ -2,6 +2,8 @@ package gzap
 
 import (
 	"errors"
+	"fmt"
+	"os"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -14,8 +16,16 @@ var Logger = getLogger()
 // logger is the package level pointer to an instantied Logger.
 var logger *zap.Logger
 
+var highPriority = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+	return lvl >= zapcore.ErrorLevel
+})
+
+var lowPriority = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+	return lvl < zapcore.ErrorLevel
+})
+
 // logInitializer represents a function that initializes
-type logInitializer func(cfg *Config) error
+type logInitializer func(cfg Config) error
 
 // envToLogInitializerMapping represents the different type of log initializers
 // to their correlating env level.
@@ -28,10 +38,10 @@ var envToLogInitializerMapping = map[int]logInitializer{
 
 // InitLogger initializes a global Logger based upon your env configurations.
 func InitLogger() error {
-	return initLogger(&Config{})
+	return initLogger(Config{})
 }
 
-func initLogger(cfg *Config) error {
+func initLogger(cfg Config) error {
 	env, err := cfg.getGraylogEnv()
 	if err != nil {
 		return err
@@ -53,25 +63,43 @@ func initLogger(cfg *Config) error {
 // use a no-op logger, to reduce test noise.
 func getLogger() *zap.Logger {
 	if logger == nil {
-		InitLogger()
+		if err := InitLogger(); err != nil {
+			panic(fmt.Sprintf("Could not initialize logger: %v", err))
+		}
 	}
 
 	return logger
 }
 
-func setProductionLogger(cfg *Config) error {
+func setProductionLogger(cfg Config) error {
 	graylog, err := NewGraylog(cfg)
 	if err != nil {
 		return err
 	}
 
+	consoleDebugging := zapcore.Lock(os.Stdout)
+	consoleErrors := zapcore.Lock(os.Stderr)
+	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+
 	zapProductionLogger := zap.New(
-		NewGelfCore(cfg, graylog),
+		zapcore.NewTee(
+			NewGelfCore(cfg, graylog),
+			zapcore.NewCore(
+				consoleEncoder,
+				consoleDebugging,
+				lowPriority,
+			),
+			zapcore.NewCore(
+				consoleEncoder,
+				consoleErrors,
+				highPriority,
+			),
+		),
 		zap.AddCaller(),
 		zap.AddStacktrace(zapcore.ErrorLevel),
 		zap.Fields(
 			zapcore.Field{
-				Key:    "Env",
+				Key:    "env",
 				String: cfg.getGraylogLogEnvName(),
 				Type:   zapcore.StringType,
 			},
@@ -83,31 +111,47 @@ func setProductionLogger(cfg *Config) error {
 	return nil
 }
 
-func setStagingLogger(cfg *Config) error {
+func setStagingLogger(cfg Config) error {
 	graylog, err := NewGraylog(cfg)
 	if err != nil {
 		return err
 	}
 
-	zapProductionLogger := zap.New(
-		NewGelfCore(cfg, graylog),
+	consoleDebugging := zapcore.Lock(os.Stdout)
+	consoleErrors := zapcore.Lock(os.Stderr)
+	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+
+	zapStagingLogger := zap.New(
+		zapcore.NewTee(
+			NewGelfCore(cfg, graylog),
+			zapcore.NewCore(
+				consoleEncoder,
+				consoleDebugging,
+				lowPriority,
+			),
+			zapcore.NewCore(
+				consoleEncoder,
+				consoleErrors,
+				highPriority,
+			),
+		),
 		zap.AddCaller(),
 		zap.AddStacktrace(zapcore.ErrorLevel),
 		zap.Fields(
 			zapcore.Field{
-				Key:    "Env",
+				Key:    "env",
 				String: cfg.getGraylogLogEnvName(),
 				Type:   zapcore.StringType,
 			},
 		),
 	)
 
-	logger = zapProductionLogger
+	logger = zapStagingLogger
 
 	return nil
 }
 
-func setDevelopmentLogger(cfg *Config) error {
+func setDevelopmentLogger(cfg Config) error {
 	if cfg._mockDevErr != nil {
 		return cfg._mockDevErr
 	}
@@ -124,7 +168,7 @@ func setDevelopmentLogger(cfg *Config) error {
 	return nil
 }
 
-func setTestLogger(cfg *Config) error {
+func setTestLogger(cfg Config) error {
 	zapNopLogger := zap.NewNop()
 	logger = zapNopLogger
 	return nil
