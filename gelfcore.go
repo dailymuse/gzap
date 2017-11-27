@@ -110,6 +110,7 @@ func (gc GelfCore) With(fields []zapcore.Field) zapcore.Core {
 		Graylog: gc.Graylog,
 		Context: append(gc.Context, fields...),
 		encoder: gc.encoder,
+		cfg:     gc.cfg,
 	}
 }
 
