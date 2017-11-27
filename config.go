@@ -86,17 +86,14 @@ func (e *EnvConfig) useTLS() bool {
 }
 
 func (e *EnvConfig) getGraylogPort() uint {
-	var portString string
+	portString := "12201"
+
 	if e.getGraylogHandlerType() == graylog.UDP {
 		portString = os.Getenv("GRAYLOG_UDP_PORT")
 	}
 
 	if e.getGraylogHandlerType() == graylog.TCP {
 		portString = os.Getenv("GRAYLOG_TLS_PORT")
-	}
-
-	if portString == "" {
-		panic("GRAYLOG_UDP_PORT or GRAYLOG_TLS_PORT env not set")
 	}
 
 	port, err := strconv.ParseUint(portString, 10, 32)
