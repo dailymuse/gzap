@@ -33,9 +33,7 @@ func TestGelfCore_Write(t *testing.T) {
 			fields{
 				&MockGraylog{},
 				[]zapcore.Field{},
-				Config{
-					_isMock: true,
-				},
+				&MockEnvConfig{},
 			},
 			args{
 				zapcore.Entry{},
@@ -50,9 +48,7 @@ func TestGelfCore_Write(t *testing.T) {
 			fields{
 				&MockGraylog{},
 				[]zapcore.Field{},
-				Config{
-					_isMock: true,
-				},
+				&MockEnvConfig{},
 			},
 			args{
 				zapcore.Entry{},
@@ -65,9 +61,14 @@ func TestGelfCore_Write(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := NewMockGraylog()
-			m.On("Send", mock.AnythingOfType("graylog.Message")).Return(tt.sendErr)
-			tt.fields.Graylog = &m
+			mockGraylog := NewMockGraylog()
+			mockGraylog.On("Send", mock.AnythingOfType("graylog.Message")).Return(tt.sendErr)
+			tt.fields.Graylog = &mockGraylog
+
+			mockEnvConfig := &MockEnvConfig{}
+			mockEnvConfig.On("getGraylogAppName").Return("LOL")
+			mockEnvConfig.On("getIsTestEnv").Return(false)
+			tt.fields.cfg = mockEnvConfig
 
 			gc := GelfCore{
 				Graylog: tt.fields.Graylog,
