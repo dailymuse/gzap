@@ -28,9 +28,7 @@ type Config interface {
 
 // EnvConfig represents all the logger configurations available
 // when instaniating a new Logger.
-type EnvConfig struct {
-	logEnvName *string
-}
+type EnvConfig struct{}
 
 func (e EnvConfig) getGraylogAppName() string {
 	appName := os.Getenv("GRAYLOG_APP_NAME")
@@ -125,18 +123,10 @@ func (e *EnvConfig) getGraylogTLSTimeout() time.Duration {
 }
 
 func (e *EnvConfig) getGraylogLogEnvName() string {
-	// Check if we already memoized the log env name.
-	if e.logEnvName != nil {
-		return *e.logEnvName
-	}
-
 	envName := os.Getenv("GRAYLOG_ENV")
 	if envName == "" {
 		panic("GRAYLOG_ENV not set")
 	}
-
-	// Memoize the log env name.
-	e.logEnvName = &envName
 
 	return envName
 }
