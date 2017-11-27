@@ -66,8 +66,7 @@ func TestGelfCore_Write(t *testing.T) {
 			tt.fields.Graylog = &mockGraylog
 
 			mockEnvConfig := &MockEnvConfig{}
-			mockEnvConfig.On("getGraylogAppName").Return("LOL")
-			mockEnvConfig.On("getIsTestEnv").Return(false)
+			mockEnvConfig.On("getGraylogAppName").Return("TEST")
 			tt.fields.cfg = mockEnvConfig
 
 			gc := GelfCore{
