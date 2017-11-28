@@ -143,7 +143,9 @@ func (e *EnvConfig) getIsTestEnv() bool {
 
 func (e *EnvConfig) useColoredConsolelogs() bool {
 	envLevel := os.Getenv("THEMUSE_ENV_LEVEL")
-	if envLevel == "1" {
+
+	// If the env level is not set use colored logs.
+	if envLevel == "" {
 		return true
 	}
 
