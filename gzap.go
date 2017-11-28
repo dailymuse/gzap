@@ -1,8 +1,6 @@
 package gzap
 
 import (
-	"errors"
-	"fmt"
 	"os"
 
 	"go.uber.org/zap"
@@ -24,35 +22,30 @@ var lowPriority = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 	return lvl < zapcore.ErrorLevel
 })
 
-// logInitializer represents a function that initializes
-type logInitializer func(cfg Config) error
-
-// envToLogInitializerMapping represents the different type of log initializers
-// to their correlating env level.
-var envToLogInitializerMapping = map[int]logInitializer{
-	testEnv:    setTestLogger,
-	devEnv:     setDevelopmentLogger,
-	stagingEnv: setStagingLogger,
-	prodEnv:    setProductionLogger,
-}
-
 // InitLogger initializes a global Logger based upon your env configurations.
 func InitLogger() error {
-	return initLogger(Config{})
+	return initLogger(&EnvConfig{})
 }
 
 func initLogger(cfg Config) error {
-	env, err := cfg.getGraylogEnv()
-	if err != nil {
-		return err
+	// If we're running in a Go test return the test logger.
+	if cfg.getIsTestEnv() {
+		return setTestLogger(cfg)
 	}
 
-	logInitalizer, ok := envToLogInitializerMapping[env]
-	if !ok {
-		return errors.New(envNotSetErrorString)
+	// Create a console output enabled zapcore.
+	zapcore := enableConsoleLogging(cfg)
+
+	// Check if Graylog host is defined
+	// if so return a Graylog Logger with
+	// console logging enabled.
+	graylogHost := cfg.getGraylogHost()
+	if graylogHost != "" {
+		return setGraylogLogger(cfg, zapcore)
 	}
 
-	return logInitalizer(cfg)
+	// Return a console logger by default.
+	return setLoggerFromCore(zapcore)
 }
 
 // getLogger is an internal function that returns an instantied Logger,
@@ -64,36 +57,23 @@ func initLogger(cfg Config) error {
 func getLogger() *zap.Logger {
 	if logger == nil {
 		if err := InitLogger(); err != nil {
-			panic(fmt.Sprintf("Could not initialize logger: %v", err))
+			panic(err)
 		}
 	}
 
 	return logger
 }
 
-func setProductionLogger(cfg Config) error {
+func setGraylogLogger(cfg Config, consoleLoggingCore zapcore.Core) error {
 	graylog, err := NewGraylog(cfg)
 	if err != nil {
 		return err
 	}
 
-	consoleDebugging := zapcore.Lock(os.Stdout)
-	consoleErrors := zapcore.Lock(os.Stderr)
-	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-
-	zapProductionLogger := zap.New(
+	zapcore := zap.New(
 		zapcore.NewTee(
 			NewGelfCore(cfg, graylog),
-			zapcore.NewCore(
-				consoleEncoder,
-				consoleDebugging,
-				lowPriority,
-			),
-			zapcore.NewCore(
-				consoleEncoder,
-				consoleErrors,
-				highPriority,
-			),
+			consoleLoggingCore,
 		),
 		zap.AddCaller(),
 		zap.AddStacktrace(zapcore.ErrorLevel),
@@ -106,70 +86,45 @@ func setProductionLogger(cfg Config) error {
 		),
 	)
 
-	logger = zapProductionLogger
+	logger = zapcore
 
 	return nil
 }
 
-func setStagingLogger(cfg Config) error {
-	graylog, err := NewGraylog(cfg)
-	if err != nil {
-		return err
-	}
-
+func enableConsoleLogging(cfg Config) zapcore.Core {
 	consoleDebugging := zapcore.Lock(os.Stdout)
 	consoleErrors := zapcore.Lock(os.Stderr)
-	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+	encoderConfig := zap.NewDevelopmentEncoderConfig()
 
-	zapStagingLogger := zap.New(
-		zapcore.NewTee(
-			NewGelfCore(cfg, graylog),
-			zapcore.NewCore(
-				consoleEncoder,
-				consoleDebugging,
-				lowPriority,
-			),
-			zapcore.NewCore(
-				consoleEncoder,
-				consoleErrors,
-				highPriority,
-			),
+	if cfg.useColoredConsolelogs() {
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	}
+
+	consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig)
+
+	zapcore := zapcore.NewTee(
+		zapcore.NewCore(
+			consoleEncoder,
+			consoleDebugging,
+			lowPriority,
 		),
-		zap.AddCaller(),
-		zap.AddStacktrace(zapcore.ErrorLevel),
-		zap.Fields(
-			zapcore.Field{
-				Key:    "env",
-				String: cfg.getGraylogLogEnvName(),
-				Type:   zapcore.StringType,
-			},
+		zapcore.NewCore(
+			consoleEncoder,
+			consoleErrors,
+			highPriority,
 		),
 	)
 
-	logger = zapStagingLogger
-
-	return nil
-}
-
-func setDevelopmentLogger(cfg Config) error {
-	if cfg._mockDevErr != nil {
-		return cfg._mockDevErr
-	}
-
-	Config := zap.NewDevelopmentConfig()
-	Config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	zapDevelopmentLogger, err := Config.Build()
-	if err != nil {
-		return err
-	}
-
-	logger = zapDevelopmentLogger
-
-	return nil
+	return zapcore
 }
 
 func setTestLogger(cfg Config) error {
 	zapNopLogger := zap.NewNop()
 	logger = zapNopLogger
+	return nil
+}
+
+func setLoggerFromCore(core zapcore.Core) error {
+	logger = zap.New(core)
 	return nil
 }
