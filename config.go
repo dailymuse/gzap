@@ -43,9 +43,6 @@ func (e EnvConfig) getGraylogAppName() string {
 func (e *EnvConfig) getGraylogHandlerType() graylog.Transport {
 	defaultHandlerType := tlsTransport
 	handlerType := os.Getenv("GRAYLOG_HANDLER_TYPE")
-	if handlerType == "" {
-		panic("GRAYLOG_HANDLER_TYPE env not set")
-	}
 
 	var transportType graylog.Transport
 	if handlerType == tlsTransport {
