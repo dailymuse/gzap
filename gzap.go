@@ -125,6 +125,9 @@ func setTestLogger(cfg Config) error {
 }
 
 func setLoggerFromCore(core zapcore.Core) error {
-	logger = zap.New(core)
+	logger = zap.New(
+		core,
+		zap.AddCaller(),
+	)
 	return nil
 }
