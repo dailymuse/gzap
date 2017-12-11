@@ -89,7 +89,7 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		extraFields[k] = fmt.Sprintf("%v", v)
 	}
 
-	if err := gc.Graylog.Send(graylog.Message{
+	msg := graylog.Message{
 		Version:      "1.1",
 		Host:         hostname,
 		ShortMessage: entry.Message,
@@ -97,8 +97,12 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		Timestamp:    entry.Time.Unix(),
 		Level:        zapToSyslog[entry.Level],
 		Extra:        extraFields,
-	}); err != nil {
-		return err
+	}
+
+	if err := gc.Graylog.Send(msg); err != nil {
+		if err := attemptRetry(gc.cfg, gc, msg); err != nil {
+			panic(err)
+		}
 	}
 
 	return nil
@@ -106,12 +110,8 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 // With adds structured context to the logger.
 func (gc GelfCore) With(fields []zapcore.Field) zapcore.Core {
-	return GelfCore{
-		Graylog: gc.Graylog,
-		Context: append(gc.Context, fields...),
-		encoder: gc.encoder,
-		cfg:     gc.cfg,
-	}
+	gc.Context = append(gc.Context, fields...)
+	return gc
 }
 
 // Sync is a no-op.
@@ -131,4 +131,32 @@ func (gc GelfCore) Check(entry zapcore.Entry, checkedEntry *zapcore.CheckedEntry
 // Enabled only enables info messages and above.
 func (gc GelfCore) Enabled(level zapcore.Level) bool {
 	return zapcore.InfoLevel.Enabled(level)
+}
+
+func attemptRetry(cfg Config, gc GelfCore, msg graylog.Message) error {
+	attempts := 3
+	var retryErr error
+
+	for i := 0; i < attempts; i++ {
+		// Attempt to create new client.
+		graylog, err := NewGraylog(cfg)
+		if err != nil {
+			retryErr = err
+			continue
+		}
+
+		// Attempt to send message.
+		err = graylog.Send(msg)
+		if err != nil {
+			retryErr = err
+			continue
+		}
+
+		// Assign new client to Gelfcore.
+		gc.Graylog = graylog
+		retryErr = nil
+		break
+	}
+
+	return retryErr
 }
