@@ -14,6 +14,8 @@ type Graylog interface {
 	Send(graylog.Message) error
 }
 
+type GraylogConstructor func(cfg Config) (Graylog, error)
+
 // NewGraylog returns a new Graylog instance.
 func NewGraylog(cfg Config) (Graylog, error) {
 	var gl Graylog

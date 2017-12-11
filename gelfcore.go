@@ -13,10 +13,11 @@ import (
 // GelfCore implements the https://godoc.org/go.uber.org/zap/zapcore#Core interface
 // Messages are written to a graylog endpoint using the GELF format + protocol
 type GelfCore struct {
-	Graylog Graylog
-	Context []zapcore.Field
-	cfg     Config
-	encoder zapcore.Encoder
+	Graylog            Graylog
+	Context            []zapcore.Field
+	cfg                Config
+	encoder            zapcore.Encoder
+	graylogConstructor GraylogConstructor
 }
 
 // NewGelfCore creates a new GelfCore with empty context.
@@ -31,9 +32,10 @@ func NewGelfCore(cfg Config, gl Graylog) GelfCore {
 	encoder := zapcore.NewJSONEncoder(encoderConfigs)
 
 	return GelfCore{
-		Graylog: gl,
-		cfg:     cfg,
-		encoder: encoder,
+		Graylog:            gl,
+		cfg:                cfg,
+		encoder:            encoder,
+		graylogConstructor: NewGraylog,
 	}
 }
 
@@ -100,7 +102,7 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	}
 
 	if err := gc.Graylog.Send(msg); err != nil {
-		if err := attemptRetry(gc.cfg, gc, msg); err != nil {
+		if err := attemptRetry(gc.cfg, gc, msg, gc.graylogConstructor); err != nil {
 			panic(err)
 		}
 	}
@@ -133,13 +135,13 @@ func (gc GelfCore) Enabled(level zapcore.Level) bool {
 	return zapcore.InfoLevel.Enabled(level)
 }
 
-func attemptRetry(cfg Config, gc GelfCore, msg graylog.Message) error {
+func attemptRetry(cfg Config, gc GelfCore, msg graylog.Message, newGraylog GraylogConstructor) error {
 	attempts := 3
 	var retryErr error
 
 	for i := 0; i < attempts; i++ {
 		// Attempt to create new client.
-		graylog, err := NewGraylog(cfg)
+		graylog, err := newGraylog(cfg)
 		if err != nil {
 			retryErr = err
 			continue

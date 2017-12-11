@@ -3,6 +3,9 @@ package gzap
 import (
 	"errors"
 	"testing"
+	"time"
+
+	"github.com/Devatoria/go-graylog"
 
 	"go.uber.org/zap"
 
@@ -21,12 +24,13 @@ func TestGelfCore_Write(t *testing.T) {
 		fields []zapcore.Field
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		err     string
-		sendErr error
+		name               string
+		fields             fields
+		args               args
+		graylogConstructor GraylogConstructor
+		wantErr            bool
+		err                string
+		sendErr            error
 	}{
 		{
 			"GelfCore.Write should return an error when failing to send message",
@@ -39,8 +43,9 @@ func TestGelfCore_Write(t *testing.T) {
 				zapcore.Entry{},
 				[]zapcore.Field{},
 			},
-			true,
-			"failed to send Graylog message",
+			nil,
+			false,
+			"",
 			errors.New("failed to send Graylog message"),
 		},
 		{
@@ -54,6 +59,7 @@ func TestGelfCore_Write(t *testing.T) {
 				zapcore.Entry{},
 				[]zapcore.Field{},
 			},
+			nil,
 			false,
 			"",
 			nil,
@@ -65,15 +71,27 @@ func TestGelfCore_Write(t *testing.T) {
 			mockGraylog.On("Send", mock.AnythingOfType("graylog.Message")).Return(tt.sendErr)
 			tt.fields.Graylog = &mockGraylog
 
+			tt.graylogConstructor = func(cfg Config) (Graylog, error) {
+				mockRetryGraylog := NewMockGraylog()
+				mockRetryGraylog.On("Send", mock.AnythingOfType("graylog.Message")).Return(nil)
+				return &mockRetryGraylog, nil
+			}
+
 			mockEnvConfig := &MockEnvConfig{}
 			mockEnvConfig.On("getGraylogAppName").Return("TEST")
+			mockEnvConfig.On("getGraylogHandlerType").Return(graylog.TCP)
+			mockEnvConfig.On("getGraylogHost").Return("test")
+			mockEnvConfig.On("getGraylogPort").Return(uint(1234))
+			mockEnvConfig.On("getGraylogTLSTimeout").Return(time.Second * 0)
+			mockEnvConfig.On("getGraylogSkipInsecureSkipVerify").Return(true)
 			tt.fields.cfg = mockEnvConfig
 
 			gc := GelfCore{
-				Graylog: tt.fields.Graylog,
-				Context: tt.fields.Context,
-				cfg:     tt.fields.cfg,
-				encoder: zapcore.NewJSONEncoder(zap.NewDevelopmentEncoderConfig()),
+				Graylog:            tt.fields.Graylog,
+				Context:            tt.fields.Context,
+				cfg:                tt.fields.cfg,
+				encoder:            zapcore.NewJSONEncoder(zap.NewDevelopmentEncoderConfig()),
+				graylogConstructor: tt.graylogConstructor,
 			}
 
 			err := gc.Write(tt.args.entry, tt.args.fields)
