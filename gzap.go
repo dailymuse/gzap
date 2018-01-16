@@ -7,6 +7,10 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// LevedLogger is a unifying type for all of the exported zap leveled loggers,
+// Info, Warn, Error, Debug.
+type LevedLogger func(msg string, fields ...zapcore.Field)
+
 // Logger is the global logger for the application. Upon first initalization of
 // the logger all calls to 'getLogger' are memoized with the instantiated 'logger'.
 var Logger = getLogger()
