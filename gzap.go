@@ -28,10 +28,10 @@ var lowPriority = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 
 // InitLogger initializes a global Logger based upon your env configurations.
 func InitLogger() error {
-	return initLogger(&EnvConfig{})
+	return initLogger(&EnvConfig{}, false)
 }
 
-func initLogger(cfg Config) error {
+func initLogger(cfg Config, disableGraylog bool) error {
 	// If we're running in a Go test return the test logger.
 	if cfg.getIsTestEnv() {
 		return setTestLogger(cfg)
@@ -44,7 +44,7 @@ func initLogger(cfg Config) error {
 	// if so return a Graylog Logger with
 	// console logging enabled.
 	graylogHost := cfg.getGraylogHost()
-	if graylogHost != "" {
+	if graylogHost != "" && !disableGraylog {
 		return setGraylogLogger(cfg, zapcore)
 	}
 
@@ -61,7 +61,14 @@ func initLogger(cfg Config) error {
 func getLogger() *zap.Logger {
 	if logger == nil {
 		if err := InitLogger(); err != nil {
-			panic(err)
+			// If the logger fails to instaniate with it's current configuration
+			// attempt to initLogger and skip setting up Graylog. This is to prevent
+			// panicing and shutting down a service when Graylog experiences difficulties.
+			// If this also fails we have a problem unrelated to Graylog and we need
+			// to panic as logging has issues that are unrecoverable.
+			if err != initLogger(&EnvConfig{}, true) {
+				panic(err)
+			}
 		}
 	}
 
