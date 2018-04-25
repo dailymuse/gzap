@@ -3,6 +3,7 @@ package gzap
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -103,7 +104,9 @@ func (gc GelfCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 	if err := gc.Graylog.Send(msg); err != nil {
 		if err := attemptRetry(gc.cfg, gc, msg, gc.graylogConstructor); err != nil {
-			panic(err)
+			// If the re-attempt fails to send the log to Graylog, simply log it to STDOUT. We
+			// do not want to panic here as it can bring down the cluster unnecessarily.
+			log.Printf("Gzap failed to send a log to Graylog:\n\terror: %+v\n\tmessage: %+v\n", err, msg)
 		}
 	}
 
