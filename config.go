@@ -15,7 +15,7 @@ const tlsTransport = "tls"
 // Config is an interface representing all the logging configurations accessible
 // via environment
 type Config interface {
-	enableGrayLogJSONFormatter() string
+	enableGrayLogJSONFormatter() bool
 	getGraylogAppName() string
 	getGraylogHandlerType() graylog.Transport
 	getGraylogHost() string
