@@ -36,7 +36,7 @@ func TestInitLogger(t *testing.T) {
 			"",
 		},
 		{
-			"InitLogger should return a json logger when no ENABLE_DATADOG_JSON_FORMATTER is set",
+			"InitLogger should return a json logger when ENABLE_DATADOG_JSON_FORMATTER is set",
 			args{
 				jsonformatter: true,
 			},
@@ -48,13 +48,13 @@ func TestInitLogger(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Instaniate new MockEnvConfig.
 			cfg := MockEnvConfig{}
+			cfg.On("enableGrayLogJSONFormatter").Return(tt.args.jsonformatter)
 			cfg.On("getGraylogAppName").Return(tt.args.graylogAppName)
 			cfg.On("getIsTestEnv").Return(tt.args.isTestEnv)
 			cfg.On("getGraylogHost").Return(tt.args.graylogHost)
 			cfg.On("getGraylogHandlerType").Return(tt.args.graylogHandlerType)
 			cfg.On("getGraylogLogEnvName").Return(tt.args.graylogLogEnvName)
 			cfg.On("useColoredConsolelogs").Return(true)
-			cfg.On("enableGrayLogJSONFormatter").Return(tt.args.jsonformatter)
 
 			err := initLogger(&cfg, false)
 

@@ -136,7 +136,8 @@ func enableConsoleLogging(cfg Config) zapcore.Core {
 }
 
 func setJSONFormatterLogger() error {
-	logger, err := zap.NewProduction()
+	jsonLogger, err := zap.NewProduction()
+	logger = jsonLogger
 	if err != nil {
 		return err
 	}
