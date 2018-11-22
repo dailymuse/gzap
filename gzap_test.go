@@ -13,6 +13,7 @@ func TestInitLogger(t *testing.T) {
 		graylogHost        string
 		graylogHandlerType graylog.Transport
 		graylogLogEnvName  string
+		jsonformatter      bool
 	}
 	tests := []struct {
 		name    string
@@ -34,6 +35,14 @@ func TestInitLogger(t *testing.T) {
 			false,
 			"",
 		},
+		{
+			"InitLogger should return a json logger when no ENABLE_DATADOG_JSON_FORMATTER is set",
+			args{
+				jsonformatter: true,
+			},
+			false,
+			"",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -45,6 +54,7 @@ func TestInitLogger(t *testing.T) {
 			cfg.On("getGraylogHandlerType").Return(tt.args.graylogHandlerType)
 			cfg.On("getGraylogLogEnvName").Return(tt.args.graylogLogEnvName)
 			cfg.On("useColoredConsolelogs").Return(true)
+			cfg.On("enableGrayLogJSONFormatter").Return(tt.args.jsonformatter)
 
 			err := initLogger(&cfg, false)
 
