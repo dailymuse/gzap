@@ -32,7 +32,7 @@ type Config interface {
 // when instaniating a new Logger.
 type EnvConfig struct{}
 
-func (e *EnvConfig) enableGrayLogJSONFormatter() string {
+func (e *EnvConfig) enableGrayLogJSONFormatter() bool {
 	jsonFormatter := os.Getenv("ENABLE_DATADOG_JSON_FORMATTER")
 	if jsonFormatter == "true" {
 		return true

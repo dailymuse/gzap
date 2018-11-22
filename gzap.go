@@ -51,7 +51,7 @@ func initLogger(cfg Config, disableGraylog bool) error {
 	// if ENABLE_DATADOG_JSON_FORMATTER then replace
 	// zapcore console log with json production log
 	if cfg.enableGrayLogJSONFormatter() {
-		return setJSONFormatter()
+		return setJSONFormatterLogger()
 	}
 
 	// Return a console logger by default.
@@ -135,7 +135,7 @@ func enableConsoleLogging(cfg Config) zapcore.Core {
 	return zapcore
 }
 
-func setJSONFormatter() error {
+func setJSONFormatterLogger() error {
 	logger, err := zap.NewProduction()
 	if err != nil {
 		return err
