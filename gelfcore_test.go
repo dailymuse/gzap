@@ -5,10 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Devatoria/go-graylog"
-
 	"go.uber.org/zap"
 
+	graylog "github.com/Devatoria/go-graylog"
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/zap/zapcore"
 )
@@ -84,6 +83,7 @@ func TestGelfCore_Write(t *testing.T) {
 			mockEnvConfig.On("getGraylogPort").Return(uint(1234))
 			mockEnvConfig.On("getGraylogTLSTimeout").Return(time.Second * 0)
 			mockEnvConfig.On("getGraylogSkipInsecureSkipVerify").Return(true)
+			mockEnvConfig.On("enableGrayLogJSONFormatter").Return(false)
 			tt.fields.cfg = mockEnvConfig
 
 			gc := GelfCore{
