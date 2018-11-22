@@ -3,7 +3,7 @@ package gzap
 import (
 	"testing"
 
-	"github.com/Devatoria/go-graylog"
+	graylog "github.com/Devatoria/go-graylog"
 )
 
 func TestInitLogger(t *testing.T) {
