@@ -15,7 +15,7 @@ const tlsTransport = "tls"
 // Config is an interface representing all the logging configurations accessible
 // via environment
 type Config interface {
-	enableGrayLogJSONFormatter() bool
+	enableJSONFormatter() bool
 	getGraylogAppName() string
 	getGraylogHandlerType() graylog.Transport
 	getGraylogHost() string
@@ -32,7 +32,7 @@ type Config interface {
 // when instaniating a new Logger.
 type EnvConfig struct{}
 
-func (e *EnvConfig) enableGrayLogJSONFormatter() bool {
+func (e *EnvConfig) enableJSONFormatter() bool {
 	jsonFormatter := os.Getenv("ENABLE_DATADOG_JSON_FORMATTER")
 	if jsonFormatter == "true" {
 		return true

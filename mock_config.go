@@ -13,7 +13,7 @@ type MockEnvConfig struct {
 	mock.Mock
 }
 
-func (m *MockEnvConfig) enableGrayLogJSONFormatter() bool {
+func (m *MockEnvConfig) enableJSONFormatter() bool {
 	args := m.Called()
 	return args.Bool(0)
 }

@@ -48,7 +48,7 @@ func TestInitLogger(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Instaniate new MockEnvConfig.
 			cfg := MockEnvConfig{}
-			cfg.On("enableGrayLogJSONFormatter").Return(tt.args.jsonformatter)
+			cfg.On("enableJSONFormatter").Return(tt.args.jsonformatter)
 			cfg.On("getGraylogAppName").Return(tt.args.graylogAppName)
 			cfg.On("getIsTestEnv").Return(tt.args.isTestEnv)
 			cfg.On("getGraylogHost").Return(tt.args.graylogHost)
