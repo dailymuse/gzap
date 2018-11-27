@@ -3,7 +3,7 @@ package gzap
 import (
 	"testing"
 
-	"github.com/Devatoria/go-graylog"
+	graylog "github.com/Devatoria/go-graylog"
 )
 
 func TestInitLogger(t *testing.T) {
@@ -13,6 +13,7 @@ func TestInitLogger(t *testing.T) {
 		graylogHost        string
 		graylogHandlerType graylog.Transport
 		graylogLogEnvName  string
+		jsonformatter      bool
 	}
 	tests := []struct {
 		name    string
@@ -34,11 +35,20 @@ func TestInitLogger(t *testing.T) {
 			false,
 			"",
 		},
+		{
+			"InitLogger should return a json logger when ENABLE_DATADOG_JSON_FORMATTER is set",
+			args{
+				jsonformatter: true,
+			},
+			false,
+			"",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Instaniate new MockEnvConfig.
 			cfg := MockEnvConfig{}
+			cfg.On("enableJSONFormatter").Return(tt.args.jsonformatter)
 			cfg.On("getGraylogAppName").Return(tt.args.graylogAppName)
 			cfg.On("getIsTestEnv").Return(tt.args.isTestEnv)
 			cfg.On("getGraylogHost").Return(tt.args.graylogHost)

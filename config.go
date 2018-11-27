@@ -13,23 +13,32 @@ import (
 const tlsTransport = "tls"
 
 // Config is an interface representing all the logging configurations accessible
-// via enironment
+// via environment
 type Config interface {
+	enableJSONFormatter() bool
 	getGraylogAppName() string
 	getGraylogHandlerType() graylog.Transport
 	getGraylogHost() string
-	useTLS() bool
 	getGraylogPort() uint
 	getGraylogTLSTimeout() time.Duration
 	getGraylogLogEnvName() string
 	getGraylogSkipInsecureSkipVerify() bool
 	getIsTestEnv() bool
+	useTLS() bool
 	useColoredConsolelogs() bool
 }
 
 // EnvConfig represents all the logger configurations available
 // when instaniating a new Logger.
 type EnvConfig struct{}
+
+func (e *EnvConfig) enableJSONFormatter() bool {
+	jsonFormatter := os.Getenv("ENABLE_DATADOG_JSON_FORMATTER")
+	if jsonFormatter == "true" {
+		return true
+	}
+	return false
+}
 
 func (e EnvConfig) getGraylogAppName() string {
 	appName := os.Getenv("GRAYLOG_APP_NAME")
@@ -64,19 +73,6 @@ func (e *EnvConfig) getGraylogHandlerType() graylog.Transport {
 func (e *EnvConfig) getGraylogHost() string {
 	graylogHost := os.Getenv("GRAYLOG_HOST")
 	return graylogHost
-}
-
-func (e *EnvConfig) useTLS() bool {
-	handlerType := os.Getenv("GRAYLOG_HANDLER_TYPE")
-	if handlerType == "" {
-		panic("GRAYLOG_HANDLER_TYPE env not set")
-	}
-
-	if handlerType == tlsTransport {
-		return true
-	}
-
-	return false
 }
 
 func (e *EnvConfig) getGraylogPort() uint {
@@ -135,6 +131,19 @@ func (e *EnvConfig) getGraylogSkipInsecureSkipVerify() bool {
 func (e *EnvConfig) getIsTestEnv() bool {
 	// If we're running test return test logger env.
 	if flag.Lookup("test.v") != nil {
+		return true
+	}
+
+	return false
+}
+
+func (e *EnvConfig) useTLS() bool {
+	handlerType := os.Getenv("GRAYLOG_HANDLER_TYPE")
+	if handlerType == "" {
+		panic("GRAYLOG_HANDLER_TYPE env not set")
+	}
+
+	if handlerType == tlsTransport {
 		return true
 	}
 

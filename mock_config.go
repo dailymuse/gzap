@@ -13,6 +13,11 @@ type MockEnvConfig struct {
 	mock.Mock
 }
 
+func (m *MockEnvConfig) enableJSONFormatter() bool {
+	args := m.Called()
+	return args.Bool(0)
+}
+
 func (m *MockEnvConfig) getGraylogAppName() string {
 	args := m.Called()
 	return args.String(0)

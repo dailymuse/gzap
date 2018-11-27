@@ -30,6 +30,7 @@ Env Name | Description
 --- | --- |
 GRAYLOG_ENV | A number 0 - 3 describing the Graylog loggin environment you wish to use (Refrence table above)
 GRAYLOG_HOST | Hostname that your graylog is currently listening on `example.graylog.com`
+ENABLE_DATADOG_JSON_FORMATTER | set to "true" to enable json formatted logs.
 
 
 ### Internal API
