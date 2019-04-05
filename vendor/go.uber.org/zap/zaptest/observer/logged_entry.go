@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Uber Technologies, Inc.
+// Copyright (c) 2017 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +18,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package zapcore defines and implements the low-level interfaces upon which
-// zap is built. By providing alternate implementations of these interfaces,
-// external packages can extend zap's capabilities.
-package zapcore // import "go.uber.org/zap/zapcore"
+package observer
+
+import "go.uber.org/zap/zapcore"
+
+// An LoggedEntry is an encoding-agnostic representation of a log message.
+// Field availability is context dependant.
+type LoggedEntry struct {
+	zapcore.Entry
+	Context []zapcore.Field
+}
+
+// ContextMap returns a map for all fields in Context.
+func (e LoggedEntry) ContextMap() map[string]interface{} {
+	encoder := zapcore.NewMapObjectEncoder()
+	for _, f := range e.Context {
+		f.AddTo(encoder)
+	}
+	return encoder.Fields
+}
