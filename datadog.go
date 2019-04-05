@@ -48,12 +48,12 @@ func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next htt
 		fields = append(fields, String("http.referer", referrer))
 	}
 
-	request_id := r.Header.Get("X-Request-Id")
-	if request_id == "" {
-		request_id = r.Header.Get("X-Amzn-Trace-Id")
+	requestId := r.Header.Get("X-Request-Id")
+	if requestId == "" {
+		requestId = r.Header.Get("X-Amzn-Trace-Id")
 	}
-	if request_id != "" {
-		fields = append(fields, String("http.request_id", request_id))
+	if requestId != "" {
+		fields = append(fields, String("http.request_id", requestId))
 	}
 
 	next(rw, r)

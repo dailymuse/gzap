@@ -16,7 +16,7 @@ func expect(t *testing.T, a interface{}, b interface{}) {
 	}
 }
 
-func Test_Datadog(t *testing.T) {
+func TestDatadog(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	handler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
