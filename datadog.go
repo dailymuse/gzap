@@ -10,9 +10,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-type Middleware struct{}
-
-func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func DatadogRequestLoggerMiddleware(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	startTime := time.Now()
 	fields := []zapcore.Field{
 		String("http.method", r.Method),
@@ -95,7 +93,7 @@ func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next htt
 // that are recognized by datadog without extra transformations.
 func DatadogRequestLoggerHandler(handler http.Handler) http.Handler {
 	n := negroni.New()
-	n.Use(&Middleware{})
+	n.Use(negroni.HandlerFunc(DatadogRequestLoggerMiddleware))
 	n.UseHandler(handler)
 	return n
 }
