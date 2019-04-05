@@ -12,7 +12,6 @@ import (
 
 type Middleware struct{}
 
-
 func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	startTime := time.Now()
 	fields := []zapcore.Field{
@@ -50,8 +49,8 @@ func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next htt
 	}
 
 	request_id := r.Header.Get("X-Request-Id")
-  if request_id == "" {
-      request_id = r.Header.Get("X-Amzn-Trace-Id")
+	if request_id == "" {
+		request_id = r.Header.Get("X-Amzn-Trace-Id")
 	}
 	if request_id != "" {
 		fields = append(fields, String("http.request_id", request_id))
@@ -86,14 +85,14 @@ func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next htt
 		r.Method,
 		r.URL.RequestURI(),
 		ip,
-		float64(duration) / float64(1e6),
+		float64(duration)/float64(1e6),
 	)
 
 	responseLogger(summary, fields...)
 }
 
-// DatadogLoggingHandler stores request-response information in attributes that are recognized
-// by datadog without extra transformations.
+// DatadogRequestLoggerHandler stores request-response information in attributes
+// that are recognized by datadog without extra transformations.
 func DatadogRequestLoggerHandler(handler http.Handler) http.Handler {
 	n := negroni.New()
 	n.Use(&Middleware{})

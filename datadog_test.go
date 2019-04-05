@@ -8,7 +8,6 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest/observer"
-
 )
 
 func expect(t *testing.T, a interface{}, b interface{}) {
