@@ -10,6 +10,21 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// General purpose ResponseWriter that should be usable by major frameworks,
+// or easily adapted to them
+type ResponseWriter interface {
+	http.ResponseWriter
+	// Status returns the status code of the response or 0 if the response has
+	// not been written
+	Status() int
+	// Written returns whether or not the ResponseWriter has been written.
+	Written() bool
+	// Size returns the size of the response body.
+	Size() int
+
+}
+
+// General purpose middleware can be used by multiple frameworks
 func DatadogRequestLoggerMiddleware(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	startTime := time.Now()
 	fields := []zapcore.Field{
@@ -56,7 +71,7 @@ func DatadogRequestLoggerMiddleware(rw http.ResponseWriter, r *http.Request, nex
 
 	next(rw, r)
 
-	res := rw.(negroni.ResponseWriter)
+	res := rw.(ResponseWriter)
 
 	statusCode := res.Status()
 	fields = append(fields, Int("http.status_code", statusCode))
