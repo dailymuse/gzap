@@ -1,6 +1,6 @@
 # gzap - Graylog Integrated Zap Logger
 
-[![GoDoc](https://godoc.org/github.com/dailymuse/gzap?status.svg)](https://godoc.org/github.com/dailymuse/gzap) [![CircleCI](https://circleci.com/gh/dailymuse/gzap.svg?style=svg)](https://circleci.com/gh/dailymuse/gzap) [![codecov](https://codecov.io/gh/dailymuse/gzap/branch/master/graph/badge.svg)](https://codecov.io/gh/dailymuse/gzap) [![Go Report Card](https://goreportcard.com/badge/github.com/dailymuse/gzap)](https://goreportcard.com/report/github.com/dailymuse/gzap)
+[![GoDoc](https://godoc.org/github.com/dailymuse/gzap?status.svg)](https://godoc.org/github.com/dailymuse/gzap) [![CircleCI](https://circleci.com/gh/dailymuse/gzap.svg?style=svg)](https://circleci.com/gh/dailymuse/gzap) [![Go Report Card](https://goreportcard.com/badge/github.com/dailymuse/gzap)](https://goreportcard.com/report/github.com/dailymuse/gzap)
 
 Gzap provide fast structured leveled logging using [zap](https://github.com/uber-go/zap), and a TCP/UDP Graylog logsink (TLS supported). Both [zap](https://github.com/uber-go/zap) and [Graylog](https://github.com/Devatoria/go-graylog) librarys are versioned locked within the applications so no other external dependencies required. 
 
